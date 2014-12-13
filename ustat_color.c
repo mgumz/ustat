@@ -7,6 +7,12 @@
 // http://ascii-table.com/ansi-escape-sequences.php
 
 
+int color_off(int fd, struct ustat_module* m, const char* s, size_t l) {
+    write(fd, "\x1b[0m", 4);
+    return 1;
+}
+
+
 //
 // 8color functions
 

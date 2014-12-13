@@ -15,6 +15,7 @@ extern int date_print(int, struct ustat_module*, const char*, size_t);
 extern int user_print(int, struct ustat_module*, const char*, size_t);
 extern int uid_print(int, struct ustat_module*, const char*, size_t);
 
+extern int color_off(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_normal_print(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_bright_print(int, struct ustat_module*, const char*, size_t);
 extern int color8_bg_normal_print(int, struct ustat_module*, const char*, size_t);
@@ -32,6 +33,7 @@ static struct ustat_module modules[] = {
     {"user",  0, 0, 0, no_init, user_print },
 
     // color-foo
+    {"coff", 0, 0, 0, no_init, color_off},
     {"8#", 0, 0, 0, no_init, color8_fg_normal_print },
     {"8*", 0, 0, 0, no_init, color8_fg_bright_print },
     {"B#", 0, 0, 0, no_init, color8_bg_normal_print },
