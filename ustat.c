@@ -14,15 +14,17 @@ extern int load_print(int fd, struct ustat_module*, const char* s, size_t len);
 extern int date_print(int fd, struct ustat_module*, const char* s, size_t len);
 extern int user_print(int fd, struct ustat_module*, const char* s, size_t len);
 extern int uid_print(int fd, struct ustat_module*, const char* s, size_t len);
+extern int color_print(int fd, struct ustat_module*, const char* s, size_t len);
 
 
 //
 static struct ustat_module modules[] = {
-    {"pass", 0, 0, 0, no_init, pass_print },
-    {"load", 0, 0, 0, no_init, load_print },
-    {"date", 0, 0, 0, no_init, date_print },
-    {"uid",  0, 0, 0, no_init, uid_print  },
-    {"user", 0, 0, 0, no_init, user_print },
+    {"pass",  0, 0, 0, no_init, pass_print },
+    {"load",  0, 0, 0, no_init, load_print },
+    {"date",  0, 0, 0, no_init, date_print },
+    {"uid",   0, 0, 0, no_init, uid_print  },
+    {"user",  0, 0, 0, no_init, user_print },
+    {"color", 0, 0, 0, no_init, color_print },
 };
 static const size_t nmodules = sizeof(modules)/sizeof(struct ustat_module);
 
