@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>
+#include <utmpx.h>
 
 int user_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
@@ -22,3 +23,20 @@ int uid_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     return 1;
 }
 
+int nusers_print(int fd, struct ustat_module* m, const char* s, size_t l) {
+
+    char buf[6];
+    int  n = 0;
+    struct utmpx* u;
+
+    for (u = getutxent(); u ; u = getutxent()) {
+        if (u->ut_type == USER_PROCESS) {
+            n++;
+        }
+    }
+
+    n = fmt_ulong(buf, n);
+    write(1, buf, n);
+
+    return 1;
+}

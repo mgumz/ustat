@@ -14,6 +14,7 @@ extern int load_print(int, struct ustat_module*, const char*, size_t);
 extern int date_print(int, struct ustat_module*, const char*, size_t);
 extern int user_print(int, struct ustat_module*, const char*, size_t);
 extern int uid_print(int, struct ustat_module*, const char*, size_t);
+extern int nusers_print(int, struct ustat_module*, const char*, size_t);
 
 extern int color_off(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_normal_print(int, struct ustat_module*, const char*, size_t);
@@ -31,6 +32,7 @@ static struct ustat_module modules[] = {
     {"date",  0, 0, 0, no_init, date_print },
     {"uid",   0, 0, 0, no_init, uid_print  },
     {"user",  0, 0, 0, no_init, user_print },
+    {"nusers", 0, 0, 0, no_init, nusers_print },
 
     // color-foo
     {"coff", 0, 0, 0, no_init, color_off},
