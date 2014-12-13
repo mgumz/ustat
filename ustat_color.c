@@ -1,5 +1,8 @@
 #include "ustat.h"
 #include "djb/str.h"
+#include "djb/fmt.h"
+#include "djb/scan.h"
+
 #include <unistd.h>
 #include <stdio.h>
 
