@@ -1,17 +1,15 @@
 #include "ustat.h"
 #include "djb/fmt.h"
 
-#include <sys/types.h>
+#include <stdint.h>
 #include <float.h>
 #include <math.h>
 #include <unistd.h>
-#include <stdio.h>
 
 
 int no_init(struct ustat_module* m, const char* s, size_t l) {
     return m->ready = 1;
 }
-
 
 int print_double(int fd, double val, int prec) {
 
@@ -48,3 +46,42 @@ int print_double(int fd, double val, int prec) {
 
     return 1;
 }
+
+
+int scan_hex(const char* s, size_t l, unsigned long* n) {
+
+    char c;
+    size_t i;
+    for (i = 0 ;i < l; i++) {
+
+        // '0 - '9'
+        c = s[i] - '0';
+        if (c < 0) {
+            return 0;
+        } else if (c <= 9) {
+            goto add;
+        }
+
+        // 'A' - 'F'
+        c = s[i] - 'A';
+        if (c < 0) {
+            return 0;
+        } else if (c <= 5) {
+            c += 10;
+            goto add;
+        }
+
+        // 'a' - 'f'
+        c = s[i] - 'a';
+        if (c < 0 || c > 5) {
+            return 0;
+        }
+        c += 10;
+add:
+        if (n) {
+            *n = (*n << 4) + c;
+        }
+    }
+    return i;
+}
+

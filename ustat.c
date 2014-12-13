@@ -9,22 +9,37 @@
 
 //
 // modules
-extern int pass_print(int fd, struct ustat_module*, const char* s, size_t len);
-extern int load_print(int fd, struct ustat_module*, const char* s, size_t len);
-extern int date_print(int fd, struct ustat_module*, const char* s, size_t len);
-extern int user_print(int fd, struct ustat_module*, const char* s, size_t len);
-extern int uid_print(int fd, struct ustat_module*, const char* s, size_t len);
-extern int color_print(int fd, struct ustat_module*, const char* s, size_t len);
+extern int pass_print(int, struct ustat_module*, const char*, size_t);
+extern int load_print(int, struct ustat_module*, const char*, size_t);
+extern int date_print(int, struct ustat_module*, const char*, size_t);
+extern int user_print(int, struct ustat_module*, const char*, size_t);
+extern int uid_print(int, struct ustat_module*, const char*, size_t);
 
+extern int color8_fg_normal_print(int, struct ustat_module*, const char*, size_t);
+extern int color8_fg_bright_print(int, struct ustat_module*, const char*, size_t);
+extern int color8_bg_normal_print(int, struct ustat_module*, const char*, size_t);
+extern int color8_bg_bright_print(int, struct ustat_module*, const char*, size_t);
+extern int xterm256_fg_print(int, struct ustat_module*, const char*, size_t);
+extern int xterm256_bg_print(int, struct ustat_module*, const char*, size_t);
+extern int rgb_fg_print(int, struct ustat_module*, const char*, size_t);
+extern int rgb_bg_print(int, struct ustat_module*, const char*, size_t);
 
-//
 static struct ustat_module modules[] = {
     {"pass",  0, 0, 0, no_init, pass_print },
     {"load",  0, 0, 0, no_init, load_print },
     {"date",  0, 0, 0, no_init, date_print },
     {"uid",   0, 0, 0, no_init, uid_print  },
     {"user",  0, 0, 0, no_init, user_print },
-    {"color", 0, 0, 0, no_init, color_print },
+
+    // color-foo
+    {"8#", 0, 0, 0, no_init, color8_fg_normal_print },
+    {"8*", 0, 0, 0, no_init, color8_fg_bright_print },
+    {"B#", 0, 0, 0, no_init, color8_bg_normal_print },
+    {"B*", 0, 0, 0, no_init, color8_bg_bright_print },
+    {"256#",  0, 0, 0, no_init, xterm256_fg_print },
+    {"256!",  0, 0, 0, no_init, xterm256_bg_print },
+    {"#", 0, 0, 0, no_init, rgb_fg_print },
+    {"!", 0, 0, 0, no_init, rgb_bg_print },
 };
 static const size_t nmodules = sizeof(modules)/sizeof(struct ustat_module);
 
