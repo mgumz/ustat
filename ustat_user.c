@@ -31,20 +31,26 @@ int uid_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 static int nusers = -1;
 
-static int cmp_func(void* vl, const void* va, const void* vb) {
-    size_t l = *(size_t*)vl;
-    const char* a = (const char*)va;
-    const char* b = (const char*)vb;
+struct str_t {
+    size_t len;
+    char* s;
+};
 
-    return str_diffn(a, b, l);
+static int str_t_cmp(const void* va, const void* vb) {
+    const struct str_t* a = (const struct str_t*)va;
+    const struct str_t* b = (const struct str_t*)vb;
+    size_t l = (a->len < b->len) ? a->len : b->len;
+
+    return str_diffn(a->s, b->s, l);
 }
 
 int nusers_init(struct ustat_module* m, const char* s, size_t l) {
 
-    struct utmpx*     u;
-    size_t name_len = sizeof(u->ut_user);
-    char*  names;
-    int    i, n;
+    struct utmpx* u;
+    size_t        name_len = sizeof(u->ut_user);
+    struct str_t* names;
+    struct str_t* name;
+    int           i, n;
 
     if (nusers != -1) {
         m->ready = 1;
@@ -76,19 +82,21 @@ int nusers_init(struct ustat_module* m, const char* s, size_t l) {
     }
 
     n = i;
-    names = malloc(n * name_len);
+    names = malloc(n * sizeof(struct str_t));
     setutxent();
     for (i = 0, u = getutxent(); u ; u = getutxent()) {
         if (u->ut_type == USER_PROCESS) {
-            byte_copy(&names[i * name_len], name_len, u->ut_user);
+            name = &names[i*sizeof(struct str_t)];
+            name->len = str_len(u->ut_user);
+            byte_copy(name->s, name->len, u->ut_user);
             i++;
         }
     }
 
-    qsort_r(names, n, name_len, &name_len, cmp_func);
+    qsort(names, n, sizeof(names[0]), str_t_cmp);
 
     for (nusers = 1 ,i = 1; i < n; i++) {
-        if (str_diffn(&names[(i-1)*name_len], &names[i*name_len], name_len) != 0) {
+        if (str_diffn(names[(i-1)*sizeof(struct str_t)].s, names[i*sizeof(struct str_t)], name_len) != 0) {
             nusers++;
         }
     }

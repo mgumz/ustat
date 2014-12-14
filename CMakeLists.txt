@@ -7,6 +7,7 @@ set(ustat_src ustat.c
     djb/byte_copy.c
     djb/scan_ulong.c
     djb/str_start.c djb/str_len.c djb/str_diffn.c
+    djb/open_read.c
     djb/fmt_ulong.c
 )
 
