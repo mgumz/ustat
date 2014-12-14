@@ -5,7 +5,6 @@
 #include "djb/str.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 //
 // modules
@@ -14,6 +13,7 @@ extern int load_print(int, struct ustat_module*, const char*, size_t);
 extern int date_print(int, struct ustat_module*, const char*, size_t);
 extern int user_print(int, struct ustat_module*, const char*, size_t);
 extern int uid_print(int, struct ustat_module*, const char*, size_t);
+extern int nusers_init(struct ustat_module*, const char*, size_t);
 extern int nusers_print(int, struct ustat_module*, const char*, size_t);
 
 extern int color_off(int, struct ustat_module*, const char*, size_t);
@@ -27,12 +27,15 @@ extern int rgb_fg_print(int, struct ustat_module*, const char*, size_t);
 extern int rgb_bg_print(int, struct ustat_module*, const char*, size_t);
 
 static struct ustat_module modules[] = {
-    {"pass",  0, 0, 0, no_init, pass_print },
-    {"load",  0, 0, 0, no_init, load_print },
-    {"date",  0, 0, 0, no_init, date_print },
-    {"uid",   0, 0, 0, no_init, uid_print  },
-    {"user",  0, 0, 0, no_init, user_print },
-    {"nusers", 0, 0, 0, no_init, nusers_print },
+    // pass-thru, skip str_len(m->name) bytes
+    {"",       0, 0, 0, no_init, pass_print },
+    {"%",      0, 0, 0, no_init, pass_print },
+
+    {"load",   0, 0, 0, no_init, load_print },
+    {"date",   0, 0, 0, no_init, date_print },
+    {"uid",    0, 0, 0, no_init, uid_print  },
+    {"user",   0, 0, 0, no_init, user_print },
+    {"nusers", 0, 0, 0, nusers_init, nusers_print },
 
     // color-foo
     {"coff", 0, 0, 0, no_init, color_off},
@@ -41,9 +44,9 @@ static struct ustat_module modules[] = {
     {"B#", 0, 0, 0, no_init, color8_bg_normal_print },
     {"B*", 0, 0, 0, no_init, color8_bg_bright_print },
     {"256#",  0, 0, 0, no_init, xterm256_fg_print },
-    {"256!",  0, 0, 0, no_init, xterm256_bg_print },
+    {"256*",  0, 0, 0, no_init, xterm256_bg_print },
     {"#", 0, 0, 0, no_init, rgb_fg_print },
-    {"!", 0, 0, 0, no_init, rgb_bg_print },
+    {"*", 0, 0, 0, no_init, rgb_bg_print },
 };
 static const size_t nmodules = sizeof(modules)/sizeof(struct ustat_module);
 
@@ -56,7 +59,7 @@ int main(int argc, char* argv[]) {
     // not yet ready.
     int i, j;
     for (i = 1; i < argc; i++) {
-        for (j = 0; j < nmodules; j++) {
+        for (j = 1; j < nmodules; j++) {
             if (str_start(argv[i], modules[j].name)) {
                 if (!modules[j].ready) {
                     modules[j].init(&modules[j], argv[i], str_len(argv[i]));

@@ -4,7 +4,6 @@
 #include "djb/scan.h"
 
 #include <unistd.h>
-#include <stdio.h>
 
 // http://en.wikipedia.org/wiki/ANSI_escape_code
 // http://ascii-table.com/ansi-escape-sequences.php
