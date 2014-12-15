@@ -1,6 +1,7 @@
 #include "ustat.h"
 #include "djb/fmt.h"
 #include <unistd.h>
+#include <stdint.h>
 
 static uint64_t n_pages;
 static uint64_t page_size;
@@ -26,7 +27,7 @@ int mem_init(struct ustat_module* m, const char* s, size_t l) {
 int mem_avail_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
     char buf[32];
-    int n = fmt_ulong(buf, n_pages * page_size);
+    int n = fmt_8longlong(buf, n_pages * page_size);
     write(fd, buf, n);
 
     return 1;
@@ -34,7 +35,7 @@ int mem_avail_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 int mem_avail_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
-    print_ull_human(fd, n_pages * page_size);
+    print_8longlong_human(fd, 1000, n_pages * page_size);
     return 1;
 }
 

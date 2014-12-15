@@ -11,6 +11,29 @@ int no_init(struct ustat_module* m, const char* s, size_t l) {
     return m->ready = 1;
 }
 
+int fmt_8longlong(char* s, unsigned long long val) {
+
+    size_t l = 0;
+    unsigned long long v = val;
+
+    for ( ; v > 9; ) {
+        l++;
+        v = v / 10;
+    }
+
+    if (s) {
+        s += l;
+        do {
+            *s = '0' + (val % 10);
+            s--;
+            val /= 10;
+        } while (val);
+    }
+
+    return l;
+}
+
+
 int print_double(int fd, double val, int prec) {
 
     int n, s;
@@ -48,15 +71,15 @@ int print_double(int fd, double val, int prec) {
 }
 
 
-int print_ull_human(int fd, unsigned long long val) {
+int print_8longlong_human(int fd, unsigned long long min, unsigned long long val) {
 
-    static const char  human_suf[] = "_KMGT";
+    static const char  human_suf[] = "_kmgt";
     static const char* last_suf = (human_suf + sizeof(human_suf));
     const char*        suf = human_suf;
     unsigned long long v = val;
     unsigned long long scale = 1;
 
-    for ( ; ((v/1000) > 0) && (suf < last_suf+1); ) {
+    for ( ; ((v/1000) > min) && (suf < last_suf+1); ) {
         v = v / 1000;
         scale *= 1000;
         suf++;

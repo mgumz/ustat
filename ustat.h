@@ -19,7 +19,8 @@ struct ustat_module {
 
 extern int no_init(struct ustat_module*, const char*, size_t);
 extern int print_double(int fd, double val, int prec);
-extern int print_ull_human(int fd, unsigned long long val);
+extern int print_8longlong_human(int fd, unsigned long long min, unsigned long long val);
+extern int fmt_8longlong(char* s, unsigned long long val);
 extern int scan_hex(const char* s, size_t l, unsigned long* n);
 extern int scan_double_from_fd(int fd, double* val);
 extern int first_n_fields(int out_fd, int fd, char sep, int n);
