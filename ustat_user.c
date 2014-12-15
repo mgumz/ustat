@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <utmpx.h>
+#include <stdio.h>
 
 
 int user_print(int fd, struct ustat_module* m, const char* s, size_t l) {
@@ -31,26 +32,27 @@ int uid_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 static int nusers = -1;
 
-struct str_t {
+struct name_t {
     size_t len;
-    char* s;
+    char s[sizeof(((struct utmpx*)0)->ut_user)];
 };
 
-static int str_t_cmp(const void* va, const void* vb) {
-    const struct str_t* a = (const struct str_t*)va;
-    const struct str_t* b = (const struct str_t*)vb;
-    size_t l = (a->len < b->len) ? a->len : b->len;
+static int name_t_cmp(const void* va, const void* vb) {
+    const struct name_t* a = (const struct name_t*)va;
+    const struct name_t* b = (const struct name_t*)vb;
+    const size_t l = (a->len < b->len) ? a->len : b->len;
 
     return str_diffn(a->s, b->s, l);
 }
 
 int nusers_init(struct ustat_module* m, const char* s, size_t l) {
 
-    struct utmpx* u;
-    size_t        name_len = sizeof(u->ut_user);
-    struct str_t* names;
-    struct str_t* name;
-    int           i, n;
+    struct utmpx*  u;
+    const size_t   name_len = sizeof(u->ut_user);
+    const size_t   ns = sizeof(struct name_t);
+    struct name_t* names;
+    struct name_t* name;
+    int            i, n;
 
     if (nusers != -1) {
         m->ready = 1;
@@ -82,21 +84,22 @@ int nusers_init(struct ustat_module* m, const char* s, size_t l) {
     }
 
     n = i;
-    names = malloc(n * sizeof(struct str_t));
+    names = malloc(n * ns);
+
     setutxent();
     for (i = 0, u = getutxent(); u ; u = getutxent()) {
         if (u->ut_type == USER_PROCESS) {
-            name = &names[i*sizeof(struct str_t)];
+            name = &names[i];
             name->len = str_len(u->ut_user);
             byte_copy(name->s, name->len, u->ut_user);
             i++;
         }
     }
 
-    qsort(names, n, sizeof(names[0]), str_t_cmp);
+    qsort(names, n, ns, name_t_cmp);
 
     for (nusers = 1 ,i = 1; i < n; i++) {
-        if (str_diffn(names[(i-1)*sizeof(struct str_t)].s, names[i*sizeof(struct str_t)], name_len) != 0) {
+        if (str_diffn(names[(i - 1)].s, names[i].s, name_len) != 0) {
             nusers++;
         }
     }
