@@ -9,6 +9,7 @@
 //
 // modules
 extern int pass_print(int, struct ustat_module*, const char*, size_t);
+extern int load_init(struct ustat_module*, const char*, size_t);
 extern int load_print(int, struct ustat_module*, const char*, size_t);
 extern int date_print(int, struct ustat_module*, const char*, size_t);
 extern int user_print(int, struct ustat_module*, const char*, size_t);
@@ -31,7 +32,7 @@ static struct ustat_module modules[] = {
     {"",       0, 0, 0, no_init, pass_print },
     {"%",      0, 0, 0, no_init, pass_print },
 
-    {"load",   0, 0, 0, no_init, load_print },
+    {"load",   0, 0, 0, load_init, load_print },
     {"date",   0, 0, 0, no_init, date_print },
     {"uid",    0, 0, 0, no_init, uid_print  },
     {"user",   0, 0, 0, no_init, user_print },

@@ -114,3 +114,65 @@ int first_n_fields(int out_fd, int in_fd, char sep, int n) {
     return 1;
 }
 
+// http://www.netlib.org/fp/dtoa.c is the correct one, this is just
+// a very very very simple approach.
+//
+// only form accepted: [-]dec[.frac]
+int scan_double_from_fd(int fd, double* val) {
+
+    size_t pos = 0;
+    double v = 0.0;
+    char c = 0;
+    char sign = 1;
+    uint64_t n = 0;
+    size_t l = 0;
+
+    // skip leading spaces
+    pos += read(fd, &c, 1);
+    for ( ; pos > 0 && (c == ' ' || c == '\t'); ) {
+        pos += read(fd, &c, 1);
+    }
+
+    // sign or eof
+    if (c == '-') {
+        sign = -1;
+    } else if (pos <= 0){
+        goto finish;
+    }
+
+    pos += read(fd, &c, 1);
+
+    // decimal
+    for ( ; c >= 0 ; ) {
+        if (c >= '0' && c <= '9') {
+            n = (n * 10) + (c - '0');
+        } else if (c == '.') {
+            v = (double)n;
+            break;
+        } else {
+            return pos;
+        }
+        pos += read(fd, &c, 1);
+    }
+
+    // fraction
+    for (n = 0; c >= 0; ) {
+        if (c >= '0' && c <= '9') {
+            l++;
+            n = (n * 10) + (c - '0');
+        } else {
+            v = (double)n * (1.0 / (double)l);
+            break;
+        }
+        pos += read(fd, &c, 1);
+    }
+
+finish:
+    v *= (double)sign;
+    if (*val) {
+        *val = v;
+    }
+
+    return pos;
+}
+
