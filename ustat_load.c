@@ -1,6 +1,5 @@
 #include "ustat.h"
 #include "djb/open.h"
-#include "djb/fmt.h"
 
 #include <unistd.h>
 #include <stdlib.h>
@@ -29,35 +28,9 @@ int load_init(struct ustat_module* m, const char* s, size_t l) {
 
 int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
-    char buf[6];
-    int n;
     int i;
-    double v;
-
     for (i = 0; i < 3; i++) {
-
-        v = _load[i];
-
-        // sign
-        if (v < 0) {
-            write(fd, "-", 1);
-            v *= -1.0;
-        }
-
-        // decimal
-        n = fmt_ulong(buf, (unsigned long)v);
-        write(fd, buf, n);
-
-        // fraction
-        write(fd, ".", 1);
-
-        v = v * 100.0;
-        n = fmt_ulong(buf, ((unsigned long)v) % 100);
-        if (n < 2) {
-            write(fd, "0", 1);
-        }
-        write(fd, buf, n);
-
+        print_double(fd, _load[i], 2);
         if (i < 2) {
             write(fd, " ", 1);
         }
@@ -123,3 +96,4 @@ static int linux_loadavg(const char* path, double load[3]) {
 }
 
 #endif
+
