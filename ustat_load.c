@@ -8,16 +8,19 @@
 
 #if defined(BSD)
 static int bsd_loadavg(double load[3]);
+#else
+static int linux_loadavg(const char* path, double load[3]);
 #endif
 
+static double _load[3] = {-1.0, -1.0, -1.0 };
 
-static double load[3] = {-1.0, -1.0, -1.0 };
+
 
 int load_init(struct ustat_module* m, const char* s, size_t l) {
 #if defined (BSD)
-    bsd_loadavg(load);
+    bsd_loadavg(_load);
 #else
-    // TODO: init linux
+    linux_loadavg("/proc/loadavg", _load);
 #endif
     m->ready = 1;
     return 1;
@@ -25,7 +28,7 @@ int load_init(struct ustat_module* m, const char* s, size_t l) {
 
 
 int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
-#if defined (BSD)
+
     char buf[6];
     int n;
     int i;
@@ -33,7 +36,7 @@ int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
     for (i = 0; i < 3; i++) {
 
-        v = load[i];
+        v = _load[i];
 
         // sign
         if (v < 0) {
@@ -59,9 +62,6 @@ int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
             write(fd, " ", 1);
         }
     }
-#else
-    return print_load_avg(fd);
-#endif
 
     return 1;
 }
@@ -96,12 +96,28 @@ static int bsd_loadavg(double load[3]) {
 
 #else
 
-int print_load_avg(int out_fd) {
-    int fd = open_read("/proc/loadavg");
+static int linux_loadavg(const char* path, double load[3]) {
+
+    double v;
+    int    p, i;
+    int    fd = open_read(path);
+
     if (fd == -1) {
+        close(fd);
         return 0;
     }
-    return first_n_fields(out_fd, fd, ' ', 3);
+
+    for (i = 0; i < 3; i++) {
+
+        p = scan_double_from_fd(fd, &v);
+        if (p <= 0) {
+            return 0;
+        }
+        load[i] = v;
+    }
+
+    close(fd);
+    return 1;
 }
 
 #endif

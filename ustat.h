@@ -20,6 +20,7 @@ struct ustat_module {
 extern int no_init(struct ustat_module*, const char*, size_t);
 extern int print_double(int fd, double val, int prec);
 extern int scan_hex(const char* s, size_t l, unsigned long* n);
+extern int scan_double_from_fd(int fd, double* val);
 extern int first_n_fields(int out_fd, int in_fd, char sep, int n);
 
 #endif

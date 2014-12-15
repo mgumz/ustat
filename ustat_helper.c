@@ -125,10 +125,11 @@ int scan_double_from_fd(int fd, double* val) {
     char c = 0;
     char sign = 1;
     uint64_t n = 0;
-    size_t l = 0;
+    uint64_t l = 1;
 
     // skip leading spaces
     pos += read(fd, &c, 1);
+
     for ( ; pos > 0 && (c == ' ' || c == '\t'); ) {
         pos += read(fd, &c, 1);
     }
@@ -136,40 +137,42 @@ int scan_double_from_fd(int fd, double* val) {
     // sign or eof
     if (c == '-') {
         sign = -1;
-    } else if (pos <= 0){
-        goto finish;
+        pos += read(fd, &c, 1);
     }
 
-    pos += read(fd, &c, 1);
+    if (pos <= 0){
+        goto finish;
+    }
 
     // decimal
     for ( ; c >= 0 ; ) {
         if (c >= '0' && c <= '9') {
             n = (n * 10) + (c - '0');
         } else if (c == '.') {
-            v = (double)n;
+            pos += read(fd, &c, 1);
             break;
         } else {
             return pos;
         }
         pos += read(fd, &c, 1);
     }
+    v = (double)n;
 
     // fraction
     for (n = 0; c >= 0; ) {
         if (c >= '0' && c <= '9') {
-            l++;
+            l *= 10;
             n = (n * 10) + (c - '0');
         } else {
-            v = (double)n * (1.0 / (double)l);
             break;
         }
         pos += read(fd, &c, 1);
     }
+    v = (double)n * (1.0 / (double)l);
 
 finish:
     v *= (double)sign;
-    if (*val) {
+    if (val) {
         *val = v;
     }
 
