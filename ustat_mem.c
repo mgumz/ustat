@@ -35,7 +35,7 @@ int mem_avail_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 int mem_avail_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
-    print_8longlong_human(fd, 1000, n_pages * page_size);
+    print_8longlong_human(fd, 1, n_pages * page_size);
     return 1;
 }
 
