@@ -72,7 +72,9 @@ int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 #include <sys/sysctl.h>
 #include <sys/resource.h>
 #include <sys/types.h>
+#ifndef VM_LOADAVG
 #include <vm/vm_param.h>
+#endif
 
 static int bsd_loadavg(double load[3]) {
 
