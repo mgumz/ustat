@@ -3,6 +3,7 @@ project(ustat)
 set(ustat_src ustat.c
     ustat_helper.c
     ustat_date.c ustat_load.c ustat_pass.c
+    ustat_mem.c
     ustat_user.c ustat_color.c
     djb/byte_copy.c
     djb/scan_ulong.c
