@@ -13,8 +13,6 @@ int no_init(struct ustat_module* m, const char* s, size_t l) {
 
 int print_double(int fd, double val, int prec) {
 
-    // TODO: rounding
-
     int n, s;
     char buf[20]; // 19 to hold uint64_t
 
@@ -35,6 +33,8 @@ int print_double(int fd, double val, int prec) {
     }
 
     val *= (double)s;
+    val += 0.5; // rounding
+
     n = fmt_ulong(buf, ((uint64_t)val) % s);
     s = prec;
 
@@ -43,6 +43,29 @@ int print_double(int fd, double val, int prec) {
         write(fd, "0", 1);
     }
     write(fd, buf, n);
+
+    return 1;
+}
+
+
+int print_ull_human(int fd, unsigned long long val) {
+
+    static const char  human_suf[] = "_KMGT";
+    static const char* last_suf = (human_suf + sizeof(human_suf));
+    const char*        suf = human_suf;
+    unsigned long long v = val;
+    unsigned long long scale = 1;
+
+    for ( ; ((v/1000) > 0) && (suf < last_suf+1); ) {
+        v = v / 1000;
+        scale *= 1000;
+        suf++;
+    }
+
+    print_double(fd, (double)val/(double)scale, 2);
+    if (suf > human_suf) {
+        write(fd, suf, 1);
+    }
 
     return 1;
 }
