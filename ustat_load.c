@@ -1,30 +1,20 @@
 #include "ustat.h"
-#include "djb/open.h"
 
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/param.h>
 
-#if defined(BSD)
-static int bsd_loadavg(double load[3]);
-#else
-static int linux_loadavg(const char* path, double load[3]);
-#endif
 
 static double _load[3] = {-1.0, -1.0, -1.0 };
 
 
+static int _get_loadavg(double load[3]);
 
 int load_init(struct ustat_module* m, const char* s, size_t l) {
-#if defined (BSD)
-    bsd_loadavg(_load);
-#else
-    linux_loadavg("/proc/loadavg", _load);
-#endif
+    _get_loadavg(_load);
     m->ready = 1;
     return 1;
 }
-
 
 int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
@@ -49,7 +39,7 @@ int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 #include <vm/vm_param.h>
 #endif
 
-static int bsd_loadavg(double load[3]) {
+static int _get_loadavg(double load[3]) {
 
     struct loadavg l;
     size_t lsize = sizeof(l);
@@ -71,29 +61,24 @@ static int bsd_loadavg(double load[3]) {
 
 #else
 
-static int linux_loadavg(const char* path, double load[3]) {
+#include <sys/sysinfo.h>
 
-    double v;
-    int    p, i;
-    int    fd = open_read(path);
+static int _get_loadavg(double load[3]) {
 
-    if (fd == -1) {
-        close(fd);
+    double scale = (double)(1 << SI_LOAD_SHIFT);
+    struct sysinfo si;
+
+    if (sysinfo(&si) == -1) {
         return 0;
     }
 
-    for (i = 0; i < 3; i++) {
+    load[0] = ((double)si.loads[0]) / scale;
+    load[1] = ((double)si.loads[1]) / scale;
+    load[2] = ((double)si.loads[2]) / scale;
 
-        p = scan_double_from_fd(fd, &v);
-        if (p <= 0) {
-            return 0;
-        }
-        load[i] = v;
-    }
-
-    close(fd);
     return 1;
 }
+
 
 #endif
 
