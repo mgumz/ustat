@@ -58,8 +58,8 @@ static struct ustat_module modules[] = {
     {"B*",     0, 0, 0, no_init, color8_bg_bright_print },
     {"256#",   0, 0, 0, no_init, xterm256_fg_print },
     {"256*",   0, 0, 0, no_init, xterm256_bg_print },
-    {"#",      0, 0, 0, no_init, rgb_fg_print },
-    {"*",      0, 0, 0, no_init, rgb_bg_print },
+    {"rgb#",   0, 0, 0, no_init, rgb_fg_print },
+    {"rgb*",   0, 0, 0, no_init, rgb_bg_print },
 };
 static const size_t nmodules = sizeof(modules)/sizeof(struct ustat_module);
 
