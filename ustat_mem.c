@@ -61,35 +61,19 @@ static int _get_total_free(uint64_t* mem_total, uint64_t* mem_free) {
 #else // *BSD
 
 #include <sys/sysctl.h>
+#include <vm/vm_param.h>
 #include <sys/vmmeter.h>
 
 static int _get_total_free(uint64_t* mem_total, uint64_t* mem_free) {
 
     size_t  len;
     int     mib[2];
-    long    total = 0;
+    long    total = sysconf(_SC_PHYS_PAGES);
     long    ps = sysconf(_SC_PAGESIZE);
 
-    if (ps == -1) {
+    if (ps == -1 || total == -1) {
         return 0;
     }
-
-#if defined (CTL_HW) && (defined(HW_MEMSIZE) || defined(HW_PHYSMEM64))
-    {
-        int64_t t;
-        mib[0] = CTL_HW;
-#if defined (HW_MEMSIZE)
-        mib[1] = HW_MEMSIZE;
-#elif defined (HW_PHYSMEM64)
-        mib[1] = HW_PHYSMEM64;
-#endif
-        len = sizeof(t);
-        if (sysctl(mib, 2, &t, &len, 0, 0) == 0) {
-            total = t;
-        }
-    }
-#endif // CTL_HW
-
 
 #if defined (CTL_VM) && (defined(VM_TOTAL) || defined(VM_METER))
     {
@@ -107,9 +91,9 @@ static int _get_total_free(uint64_t* mem_total, uint64_t* mem_free) {
             return 1;
         }
     }
+#else
+#error "not implemented"
 #endif
-
-    *mem_total = (uint64_t)total * (uint64_t)ps;
 
     return 0;
 }
