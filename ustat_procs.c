@@ -27,14 +27,17 @@ int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 
 #if defined(BSD)
+
 #include <sys/sysctl.h>
+#include <sys/user.h> // struct kinfo_proc freebsd
 
 static int _get_number_active_processes(size_t* nproc) {
 
-    int     mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL };
+    const int     mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PROC };
+    const size_t  mibs = sizeof(mib)/sizeof(mib[0]);
     size_t  val;
 
-    if (sysctl(mib, sizeof(mib)/sizeof(mib[0]), 0, &val, 0, 0) != 0) {
+    if (sysctl(mib, mibs, 0, &val, 0, 0) != 0) {
         return 0;
     }
 
