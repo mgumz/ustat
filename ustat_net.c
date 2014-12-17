@@ -3,6 +3,9 @@
 #include "djb/byte.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <stddef.h>
+#include <ctype.h>
+#include <stdint.h>
 
 enum {
     TCP_ESTABLISHED = 1,
@@ -86,8 +89,13 @@ int static print(int fd, uint64_t val) {
 
 #include <ctype.h>
 
-// ugly state-maschine
-struct sm {
+//
+// collecting tcp-connection stats under linux is a matter of parsing
+// /proc/net/tcp and /proc/net/tcp6
+//
+// 'ss' (iproute2) and 'netstat' do it similar
+
+struct buffered_byte_reader  {
     char    prev;
     char    cur;
 
@@ -97,85 +105,88 @@ struct sm {
     size_t  consumed;
     ssize_t err;
 
-    char    buf[4096];
+    // 16k buffer. why? because /proc/net/tcp get's quite 'huge', for moderate
+    // traffic it's in the range of 'megabyte'. parsing that file in 16k
+    // blocks yields 'best' speed vs use or ram
+    char    buf[16 * 1024];
 };
 
-static int read_byte(int fd, struct sm* m) {
+static int read_byte(int fd, struct buffered_byte_reader* br) {
 
-    m->pos++;
+    br->pos++;
 
-    if (m->pos >= m->end) { // fill buffer when needed
-        m->end = read(fd, m->buf, sizeof(m->buf));
-        m->pos = 0;
+    if (br->pos >= br->end) { // fill buffer when needed
+        br->end = read(fd, br->buf, sizeof(br->buf));
+        br->pos = 0;
     }
 
-    if (m->end > 0) {
-        m->consumed++;
-        m->cur = m->buf[m->pos];
+    if (br->end > 0) {
+        br->consumed++;
+        br->cur = br->buf[br->pos];
         return 1;
     }
 
-    m->err = m->end;
+    br->err = br->end;
     return 0;
 }
 
 static int process_proc_tcp(int fd, int state_field, uint64_t* store, size_t lstore) {
 
     int rc = 0;
-    struct sm m = {.pos = 0, .end = 0};
+    struct buffered_byte_reader r = {.pos = 0, .end = 0};
     unsigned long val;
 
     // skip first line by treating it as any other line behind the 'state'
     // field
 seek_to_eol:
-    for ( ; read_byte(fd, &m); ) {
-        if (m.err) {
+    for ( ; read_byte(fd, &r); ) {
+        if (r.err) {
             goto end;
         }
-        if (m.cur == '\n') {
+        if (r.cur == '\n') {
             goto skip_leading_ws;
         }
     }
     goto end;
 
 skip_leading_ws:
-    for ( ; read_byte(fd, &m) ; ) {
-        if (m.err) {
+    for ( ; read_byte(fd, &r) ; ) {
+        if (r.err) {
             goto end;
         }
-        if (!isspace(m.cur)) {
+        if (!isspace(r.cur)) {
             goto skip_n_fields;
         }
     }
     goto end;
 
 skip_n_fields:
-    m.field = 0;
-    m.prev = m.cur;
-    for ( ; m.field < state_field && read_byte(fd, &m); ) {
-        if (m.err) {
+    r.field = 0;
+    r.prev = r.cur;
+    for ( ; r.field < state_field && read_byte(fd, &r); ) {
+        if (r.err) {
             goto end;
         }
-        if (isspace(m.prev) && !isspace(m.cur)) {
-            m.field++;
+        if (isspace(r.prev) && !isspace(r.cur)) {
+            r.field++;
         }
-        m.prev = m.cur;
+        r.prev = r.cur;
     }
 
     // we read to few fields
-    if (m.field != state_field) {
+    if (r.field != state_field) {
         goto end;
     }
 
     // m->prev now has the first byte of the field we are interested in,
     // read one more
-    if (!read_byte(fd, &m)) {
+    if (!read_byte(fd, &r)) {
         goto end;
     }
 
     val = 0;
     // .prev and .cur are next to each other
-    if (scan_hex(&m.prev, 2, &val) != 2) {
+    if (scan_hex(&r.prev, 2, &val) != 2) {
         goto end;
     }
 
