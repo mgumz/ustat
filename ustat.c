@@ -36,6 +36,12 @@ extern int xterm256_bg_print(int, struct ustat_module*, const char*, size_t);
 extern int rgb_fg_print(int, struct ustat_module*, const char*, size_t);
 extern int rgb_bg_print(int, struct ustat_module*, const char*, size_t);
 
+
+
+static int no_init(struct ustat_module* m, const char* s, size_t l) {
+    return m->ready = 1;
+}
+
 static struct ustat_module modules[] = {
     // pass-thru, skip str_len(m->name) bytes
     {"",       0, 0, 0, no_init, pass_print },

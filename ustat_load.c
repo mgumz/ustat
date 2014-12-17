@@ -20,7 +20,7 @@ int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
     int i;
     for (i = 0; i < 3; i++) {
-        print_double(fd, _load[i], 2);
+        write_double(fd, _load[i], 2);
         if (i < 2) {
             write(fd, " ", 1);
         }

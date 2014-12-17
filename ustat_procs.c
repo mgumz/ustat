@@ -1,8 +1,9 @@
 #include "ustat.h"
 #include "djb/fmt.h"
-#include <unistd.h>
-#include <stdint.h>
+#include <stddef.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <unistd.h>
 #include <sys/param.h>
 
 

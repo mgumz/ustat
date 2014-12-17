@@ -1,11 +1,20 @@
 project(ustat)
 
-set(ustat_src ustat.c
-    ustat_helper.c
-    ustat_date.c ustat_load.c ustat_pass.c
+set(ustat_src
+    ustat.c
+    ustat_color.c
+    ustat_cpu.c
+    ustat_date.c
+    ustat_load.c
     ustat_mem.c
-    ustat_user.c ustat_color.c
-    ustat_procs.c ustat_cpu.c
+    ustat_pass.c
+    ustat_procs.c
+    ustat_user.c
+    ustat_helper/fmt_8ll.c
+    ustat_helper/read_double_from_fd.c
+    ustat_helper/scan_hex.c
+    ustat_helper/write_8ll.c
+    ustat_helper/write_double.c
     djb/byte_copy.c
     djb/scan_ulong.c
     djb/str_start.c djb/str_len.c djb/str_diffn.c

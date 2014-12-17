@@ -136,14 +136,14 @@ int mem_free_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 }
 
 int mem_total_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
-    return print_8longlong_human(fd, 1, _mem_total);
+    return write_8longlong_human(fd, 1, _mem_total);
 }
 
 int mem_free_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
-    return print_8longlong_human(fd, 1, _mem_free);
+    return write_8longlong_human(fd, 1, _mem_free);
 }
 
 int mem_ratio_print(int fd, struct ustat_module* m, const char* s, size_t l) {
-    return print_double(fd, (double)_mem_free / (double)_mem_total, 2);
+    return write_double(fd, (double)_mem_free / (double)_mem_total, 2);
 }
 

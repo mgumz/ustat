@@ -1,0 +1,39 @@
+#include <stddef.h>
+
+int scan_hex(const char* s, size_t l, unsigned long* n) {
+
+    char c;
+    size_t i;
+    for (i = 0 ;i < l; i++) {
+
+        // '0 - '9'
+        c = s[i] - '0';
+        if (c < 0) {
+            return 0;
+        } else if (c <= 9) {
+            goto add;
+        }
+
+        // 'A' - 'F'
+        c = s[i] - 'A';
+        if (c < 0) {
+            return 0;
+        } else if (c <= 5) {
+            c += 10;
+            goto add;
+        }
+
+        // 'a' - 'f'
+        c = s[i] - 'a';
+        if (c < 0 || c > 5) {
+            return 0;
+        }
+        c += 10;
+add:
+        if (n) {
+            *n = (*n << 4) + c;
+        }
+    }
+    return i;
+}
+
