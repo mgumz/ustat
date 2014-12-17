@@ -5,20 +5,17 @@
 #include <stdlib.h>
 #include <sys/param.h>
 
-#include <sys/sysctl.h>
+
+static int _get_number_active_processes(size_t* nproc);
 
 int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
-    int     mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL };
-    size_t  nproc;
+    size_t  nproc = 0;
     char*   buf;
     int     n;
 
-    if (sysctl(mib, sizeof(mib)/sizeof(mib[0]), 0, &nproc, 0, 0) != 0) {
-        return 0;
-    }
+    _get_number_active_processes(&nproc);
 
-    nproc = nproc / sizeof(struct kinfo_proc);
     n = fmt_ulong(0, nproc);
     buf = alloca(n);
     fmt_ulong(buf, nproc);
@@ -26,3 +23,55 @@ int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
     return 1;
 }
+
+
+#if defined(BSD)
+#include <sys/sysctl.h>
+
+static int _get_number_active_processes(size_t* nproc) {
+
+    int     mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_ALL };
+    size_t  val;
+
+    if (sysctl(mib, sizeof(mib)/sizeof(mib[0]), 0, &val, 0, 0) != 0) {
+        return 0;
+    }
+
+    *nproc  = val / sizeof(struct kinfo_proc);
+
+    return 1;
+}
+
+#else
+
+// NOTES: sysinfo() yields strange results when called from
+// inside a openvz-container. that's why we travers /proc
+
+#include <sys/types.h>
+#include <dirent.h>
+static int _get_number_active_processes(size_t* nproc) {
+
+    size_t val = 0;
+    struct dirent* entry;
+    DIR* proc = opendir("/proc");
+
+    if (!proc) {
+        return 0;
+    }
+
+    // bold assumption: isdigit(entry->d_name[0]) is enough
+    // to declare a process-id. alternative: scan_8long()
+    for (entry = readdir(proc); entry; entry = readdir(proc)) {
+        if (isdigit(entry->d_name[0])) {
+            val++;
+        }
+    }
+
+    closedir(proc);
+    *nproc = val;
+
+    return 1;
+}
+
+#endif
+
