@@ -7,6 +7,7 @@ set(ustat_src
     ustat_date.c
     ustat_load.c
     ustat_mem.c
+    ustat_net.c
     ustat_pass.c
     ustat_procs.c
     ustat_user.c
@@ -15,7 +16,7 @@ set(ustat_src
     ustat_helper/scan_hex.c
     ustat_helper/write_8ll.c
     ustat_helper/write_double.c
-    djb/byte_copy.c
+    djb/byte_copy.c djb/byte_zero.c
     djb/scan_ulong.c
     djb/str_start.c djb/str_len.c djb/str_diffn.c
     djb/open_read.c

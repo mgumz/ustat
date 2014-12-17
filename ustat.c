@@ -26,6 +26,12 @@ extern int mem_ratio_print(int, struct ustat_module*, const char*, size_t);
 extern int nproc_print(int, struct ustat_module*, const char*, size_t);
 extern int ncpus_print(int, struct ustat_module*, const char*, size_t);
 
+extern int tcp_init(struct ustat_module*, const char*, size_t);
+extern int ntcp_all_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp_closing_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp_established_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp_listen_print(int, struct ustat_module*, const char*, size_t);
+
 extern int color_off(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_normal_print(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_bright_print(int, struct ustat_module*, const char*, size_t);
@@ -61,6 +67,11 @@ static struct ustat_module modules[] = {
     {"memr",   0, 0, 0, mem_init, mem_ratio_print },
     {"memh",   0, 0, 0, mem_init, mem_total_human_print },
     {"mem",    0, 0, 0, mem_init, mem_total_print },
+
+    {"tcp.established", 0, 0, 0, tcp_init, ntcp_established_print },
+    {"tcp.listen",      0, 0, 0, tcp_init, ntcp_listen_print },
+    {"tcp.closing",     0, 0, 0, tcp_init, ntcp_closing_print },
+    {"tcp",             0, 0, 0, tcp_init, ntcp_all_print },
 
     // color-foo
     {"coff",   0, 0, 0, no_init, color_off },
