@@ -23,6 +23,9 @@ extern int mem_free_print(int, struct ustat_module*, const char*, size_t);
 extern int mem_free_human_print(int, struct ustat_module*, const char*, size_t);
 extern int mem_ratio_print(int, struct ustat_module*, const char*, size_t);
 
+extern int nproc_print(int, struct ustat_module*, const char*, size_t);
+extern int ncpus_print(int, struct ustat_module*, const char*, size_t);
+
 extern int color_off(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_normal_print(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_bright_print(int, struct ustat_module*, const char*, size_t);
@@ -43,6 +46,9 @@ static struct ustat_module modules[] = {
     {"uid",    0, 0, 0, no_init, uid_print  },
     {"user",   0, 0, 0, no_init, user_print },
     {"nusers", 0, 0, 0, nusers_init, nusers_print },
+
+    {"nproc",  0, 0, 0, no_init, nproc_print },
+    {"ncpus",  0, 0, 0, no_init, ncpus_print },
 
     {"memfh",  0, 0, 0, mem_init, mem_free_human_print },
     {"memf",   0, 0, 0, mem_init, mem_free_print },
