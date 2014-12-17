@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <ctype.h>
 
 int scan_hex(const char* s, size_t l, unsigned long* n) {
 
@@ -9,24 +10,15 @@ int scan_hex(const char* s, size_t l, unsigned long* n) {
         // '0 - '9'
         c = s[i] - '0';
         if (c < 0) {
-            return 0;
+            return i;
         } else if (c <= 9) {
             goto add;
         }
 
-        // 'A' - 'F'
-        c = s[i] - 'A';
-        if (c < 0) {
-            return 0;
-        } else if (c <= 5) {
-            c += 10;
-            goto add;
-        }
-
         // 'a' - 'f'
-        c = s[i] - 'a';
+        c = tolower(s[i]) - 'a';
         if (c < 0 || c > 5) {
-            return 0;
+            return i;
         }
         c += 10;
 add:
