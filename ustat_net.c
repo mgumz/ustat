@@ -50,6 +50,7 @@ int tcp_init(struct ustat_module* m, const char* s, size_t l) {
         return 0;
     }
 
+    inited = 1;
     m->ready = 1;
     return 1;
 }
@@ -213,8 +214,6 @@ static int init_tcp_stats() {
     if (fd < 0) {
         return 0;
     }
-
-    inited = 1;
 
     byte_zero(_tcp_counters, sizeof(_tcp_counters));
     byte_zero(_tcp4_counters, sizeof(_tcp4_counters));
