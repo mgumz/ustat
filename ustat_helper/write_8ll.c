@@ -1,4 +1,4 @@
-#include "ustat.h"
+#include "../ustat.h"
 #include <unistd.h>
 
 int write_double(int fd, double val, int prec);
