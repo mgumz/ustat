@@ -6,10 +6,29 @@
 #include <stddef.h>
 #include <ctype.h>
 #include <stdint.h>
-#include <netinet/tcp.h>
 
-#if 0
-enum {
+#include <sys/param.h>
+
+#if defined (BSD)
+
+// TODO:
+
+#else
+
+#ifdef __dietlibc__
+typedef long __kernel_long_t;
+typedef unsigned long __kernel_ulong_t;
+typedef unsigned short __kernel_sa_family_t;
+#endif
+
+#include <netinet/in.h>
+#include <linux/socket.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/inet_diag.h>
+#include <linux/sock_diag.h>
+
+enum{
     TCP_ESTABLISHED = 1,
     TCP_SYN_SENT,
     TCP_SYN_RECV,
@@ -20,18 +39,16 @@ enum {
     TCP_CLOSE_WAIT,
     TCP_LAST_ACK,
     TCP_LISTEN,
-    TCP_CLOSING,    /* Now a valid state */
-
-    TCP_MAX_STATES  /* Leave at the end! */
+    TCP_CLOSING
 };
+
 #endif
 
-const size_t TCP_MAX_STATES = TCP_CLOSING + 1;
-
 // index 0 holds the sum
-static uint64_t _tcp_counters[TCP_MAX_STATES];
-static uint64_t _tcp4_counters[TCP_MAX_STATES];
-static uint64_t _tcp6_counters[TCP_MAX_STATES];
+static uint64_t  _tcp_counters[TCP_CLOSING + 1];
+static uint64_t _tcp4_counters[TCP_CLOSING + 1];
+static uint64_t _tcp6_counters[TCP_CLOSING + 1];
+
 const size_t _n_tcp_states = sizeof(_tcp_counters) / sizeof(_tcp_counters[0]);
 
 static int process_proc_tcp(int fd, int skip_fields, uint64_t* store, size_t lstore);
@@ -93,3 +110,4 @@ int static print(int fd, uint64_t val) {
 #else
 #include "ustat_net_linux.c"
 #endif
+
