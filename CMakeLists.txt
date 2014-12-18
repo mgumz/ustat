@@ -12,6 +12,7 @@ set(ustat_src
     ustat_procs.c
     ustat_user.c
     ustat_helper/fmt_8ll.c
+    ustat_helper/os_exit.c
     ustat_helper/read_double_from_fd.c
     ustat_helper/scan_hex.c
     ustat_helper/write_8ll.c
