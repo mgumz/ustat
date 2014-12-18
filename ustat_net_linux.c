@@ -119,8 +119,9 @@ end:
 }
 
 
-// maybe enough, but it takes ~0.2s to parse a 1mb /proc/net/tcp file
-// on a openvz-guest. it's noticable.
+
+// the should-always-work method. maybe fast enough, but it takes ~0.2s to parse a 1mb 
+// /proc/net/tcp file with ~5k entries on a openvz-guest. it's noticable.
 static int init_tcp_stats_via_proc_net_tcp() {
 
     static const char tcpv4_name[] = "/proc/net/tcp";
@@ -163,6 +164,8 @@ static int init_tcp_stats_via_proc_net_tcp() {
 // * http://kristrev.github.io/2013/07/26/passive-monitoring-of-sockets-on-linux/
 // * https://github.com/kristrev/inet-diag-example
 // * http://www.linuxjournal.com/article/7356
+
+#if USTAT_NETLINK
 
 static int _request_tcp_diag(int sock, int family);
 static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l, uint64_t* counter);
@@ -269,6 +272,7 @@ static int _request_tcp_diag(int sock, int family) {
     return sendmsg(sock, &msg, 0);
 }
 
+#endif // USTAT_NETLINK
 
 // sum all elements from 'from[1-(l-1)]' into 'from[0] and
 // add 'from[i]' onto 'to[i]'
@@ -282,15 +286,14 @@ static void _sum_counters(uint64_t* to, uint64_t* from, size_t l) {
 }
 
 
-#include <stdlib.h>
 static int init_tcp_stats() {
 
     int rc = 0;
-
+#if USTAT_NETLINK
     if (!getenv("FORCE_PROC_NET_TCP")) {
         rc = init_tcp_stats_via_netlink();
     }
-
+#endif
     if (!rc) {
         rc = init_tcp_stats_via_proc_net_tcp();
     }
