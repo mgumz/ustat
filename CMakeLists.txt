@@ -1,6 +1,7 @@
-project(ustat)
+PROJECT(ustat)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
-set(ustat_src
+SET(ustat_src
     ustat.c
     ustat_color.c
     ustat_cpu.c
@@ -24,4 +25,17 @@ set(ustat_src
     djb/fmt_ulong.c
 )
 
-add_executable(ustat ${ustat_src})
+# check for netlink-support
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    INCLUDE(CheckTypeSize)
+    SET(CMAKE_EXTRA_INCLUDE_FILES netinet/in.h linux/socket.h linux/netlink.h linux/rtnetlink.h linux/inet_diag.h)
+    CHECK_TYPE_SIZE("struct inet_diag_req_v23" USTAT_NETLINK)
+    IF(USTAT_NETLINK)
+        ADD_DEFINITIONS(-DUSTAT_NETLINK=1)
+    ELSE(USTAT_NETLINK)
+        MESSAGE(WARNING "no compile-time support for netlink found: 'tcp'-module uses only the /proc/net/tcp*-parser.")
+    ENDIF(USTAT_NETLINK)
+    SET(CMAKE_EXTRA_INCLUDE_FILES)
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+
+ADD_EXECUTABLE(ustat ${ustat_src})

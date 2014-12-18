@@ -27,14 +27,7 @@ typedef unsigned short __kernel_sa_family_t;
 #include <linux/rtnetlink.h>
 #include <linux/inet_diag.h>
 
-
-// missing inet_diag_req_v2 is a sign for an old kernel (2.6.x)
-// with limited support for netlink (at least on the building
-// machine and that's why we disable the netlink-methods
-#ifndef inet_diag_req_v2
-#  define USTAT_NETLINK 0
-#else
-#  define USTAT_NETLINK 1
+#if defined(USTAT_NETLINK) && USTAT_NETLINK
 // include it here because if inet_diag_req_v2 is not defined it's
 // still an older kernel where <linux/sock_diag.h> is not available
 #  include <linux/sock_diag.h>
