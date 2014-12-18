@@ -6,7 +6,9 @@
 #include <stddef.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <netinet/tcp.h>
 
+#if 0
 enum {
     TCP_ESTABLISHED = 1,
     TCP_SYN_SENT,
@@ -22,6 +24,9 @@ enum {
 
     TCP_MAX_STATES  /* Leave at the end! */
 };
+#endif
+
+const size_t TCP_MAX_STATES = TCP_CLOSING + 1;
 
 // index 0 holds the sum
 static uint64_t _tcp_counters[TCP_MAX_STATES];

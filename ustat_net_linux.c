@@ -117,7 +117,9 @@ end:
 }
 
 
-static int init_tcp_stats() {
+// maybe enough, but it takes ~0.2s to parse a 1mb /proc/net/tcp file
+// on a openvz-guest. it's noticable.
+static int init_tcp_stats_via_proc_net_tcp() {
 
     int i;
     int fd = open_read("/proc/net/tcp");
@@ -152,5 +154,110 @@ static int init_tcp_stats() {
     }
 
     return 1;
+}
+
+
+// maybe a faster approach to get the stats of the tcp-sockets: netlink to the
+// kernel.
+//
+// good sources of information:
+//
+// * http://kristrev.github.io/2013/07/26/passive-monitoring-of-sockets-on-linux/
+// * https://github.com/kristrev/inet-diag-example
+// * http://www.linuxjournal.com/article/7356
+
+#include <errno.h>
+#include <string.h>
+#include <asm/types.h>
+#include <sys/socket.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <linux/inet_diag.h>
+
+static int send_diag_msg(int sock);
+
+static int init_tcp_stats_via_netlink() {
+
+    char done = 0;
+    int nl_sock = 0;
+    struct inet_diag_msg* msg;
+    const size_t msg_size = sizeof(*msg);
+    uint8_t buf[4096]; // TODO: use page-size here
+
+    if((nl_sock = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)) == -1){
+        os_exit(1, strerror(errno));
+    }
+
+    if(send_diag_msg(nl_sock) < 0){
+        os_exit(1, strerror(errno));
+    }
+
+    for ( ; !done ; ) {
+
+        int n = recv(nl_sock, buf, sizeof(buf), 0);
+        int rtalen = 0;
+        struct nlmsghdr* nl_header = (struct nlmsghdr*)buf;
+
+        for ( ;NLMSG_OK(nl_header, n); ) {
+            if (nl_header->nlmsg_type == NLMSG_DONE) {
+                done = 1;
+                break;
+            } else if (nl_header->nlmsg_type == NLMSG_ERROR) {
+                done = 1;
+                os_exit(2, "error in reading nlmsgs");
+            }
+
+            msg = (struct inet_diag_msg*)NLMSG_DATA(nl_header);
+            rtalen = nl_header->nlmsg_len - NLMSG_LENGTH(msg_size);
+            // TODO parsing the msg
+            nl_header = NLMSG_NEXT(nl_header, n);
+        }
+    }
+
+    return 1;
+}
+
+
+static int send_diag_msg(int sock) {
+
+    struct msghdr           msg;
+    struct nlmsghdr         nlh;
+    struct inet_diag_req    c_req; // kernel 2.6, inet_diag_req_v2 since v3.3
+    struct sockaddr_nl      sa;
+    struct rtattr           rta;
+    struct iovec            iov[4];
+
+    byte_zero(&msg, sizeof(msg));
+    byte_zero(&nlh, sizeof(nlh));
+    byte_zero(&sa, sizeof(sa));
+    byte_zero(&c_req, sizeof(c_req));
+
+    sa.nl_family = AF_NETLINK;
+    c_req.idiag_family = AF_INET;
+    c_req.idiag_states = TCPF_ALL;
+    //c_req.idiag_protocol = IPROTO_TCP;
+    //c_req.idiag_states = TCPF_ALL;
+
+    nlh.nlmsg_len = NLMSG_LENGTH(sizeof(c_req));
+    nlh.nlmsg_flags = NLM_F_DUMP|NLM_F_REQUEST;
+    nlh.nlmsg_type = SOCK_DIAG_BY_FAMILY;
+
+    iov[0].iov_base = (void*)&nlh;
+    iov[0].iov_len = sizeof(nlh);
+    iov[1].iov_base = (void*)&c_req;
+    iov[1].iov_len = sizeof(c_req);
+
+    msg.msg_name = (void*)&sa;
+    msg.msg_namelen = sizeof(sa);
+    msg.msg_iov = iov;
+    msg.msg_iovlen = 2;
+
+    return sendmsg(sock, &msg, 0);
+}
+
+
+
+static int init_tcp_stats() {
+    return init_tcp_stats_via_netlink();
 }
 
