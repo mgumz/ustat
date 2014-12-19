@@ -8,7 +8,7 @@ SET(ustat_src
     ustat_date.c
     ustat_load.c
     ustat_mem.c
-    ustat_net.c
+    ustat_tcp.c
     ustat_pass.c
     ustat_procs.c
     ustat_user.c

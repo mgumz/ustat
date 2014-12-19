@@ -31,6 +31,15 @@ extern int ntcp_all_print(int, struct ustat_module*, const char*, size_t);
 extern int ntcp_closing_print(int, struct ustat_module*, const char*, size_t);
 extern int ntcp_established_print(int, struct ustat_module*, const char*, size_t);
 extern int ntcp_listen_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp6_all_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp6_closing_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp6_established_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp6_listen_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp4_all_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp4_closing_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp4_established_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp4_listen_print(int, struct ustat_module*, const char*, size_t);
+extern int ntcp_print(int, struct ustat_module*, const char*, size_t);
 
 extern int color_off(int, struct ustat_module*, const char*, size_t);
 extern int color8_fg_normal_print(int, struct ustat_module*, const char*, size_t);
@@ -50,28 +59,37 @@ static int no_init(struct ustat_module* m, const char* s, size_t l) {
 
 static struct ustat_module modules[] = {
     // pass-thru, skip str_len(m->name) bytes
-    {"",       0, 0, 0, no_init, pass_print },
-    {"%",      0, 0, 0, no_init, pass_print },
+    {"",        0, 0, 0, no_init, pass_print },
+    {"%",       0, 0, 0, no_init, pass_print },
 
-    {"load",   0, 0, 0, load_init, load_print },
-    {"date",   0, 0, 0, no_init, date_print },
-    {"uid",    0, 0, 0, no_init, uid_print  },
-    {"user",   0, 0, 0, no_init, user_print },
-    {"nusers", 0, 0, 0, nusers_init, nusers_print },
+    {"load",    0, 0, 0, load_init, load_print },
+    {"date",    0, 0, 0, no_init, date_print },
+    {"uid",     0, 0, 0, no_init, uid_print  },
+    {"user",    0, 0, 0, no_init, user_print },
+    {"nusers",  0, 0, 0, nusers_init, nusers_print },
 
-    {"nproc",  0, 0, 0, no_init, nproc_print },
-    {"ncpus",  0, 0, 0, no_init, ncpus_print },
+    {"nproc",   0, 0, 0, no_init, nproc_print },
+    {"ncpus",   0, 0, 0, no_init, ncpus_print },
 
-    {"memfh",  0, 0, 0, mem_init, mem_free_human_print },
-    {"memf",   0, 0, 0, mem_init, mem_free_print },
-    {"memr",   0, 0, 0, mem_init, mem_ratio_print },
-    {"memh",   0, 0, 0, mem_init, mem_total_human_print },
-    {"mem",    0, 0, 0, mem_init, mem_total_print },
+    {"memfh",   0, 0, 0, mem_init, mem_free_human_print },
+    {"memf",    0, 0, 0, mem_init, mem_free_print },
+    {"memr",    0, 0, 0, mem_init, mem_ratio_print },
+    {"memh",    0, 0, 0, mem_init, mem_total_human_print },
+    {"mem",     0, 0, 0, mem_init, mem_total_print },
 
-    {"tcp.established", 0, 0, 0, tcp_init, ntcp_established_print },
-    {"tcp.listen",      0, 0, 0, tcp_init, ntcp_listen_print },
-    {"tcp.closing",     0, 0, 0, tcp_init, ntcp_closing_print },
-    {"tcp",             0, 0, 0, tcp_init, ntcp_all_print },
+    {"tcpdump", 0, 0, 0, tcp_init, ntcp_print },
+    {"tcp.e",   0, 0, 0, tcp_init, ntcp_established_print },
+    {"tcp.l",   0, 0, 0, tcp_init, ntcp_listen_print },
+    {"tcp.c",   0, 0, 0, tcp_init, ntcp_closing_print },
+    {"tcp",     0, 0, 0, tcp_init, ntcp_all_print },
+    {"tcp6.e",  0, 0, 0, tcp_init, ntcp6_established_print },
+    {"tcp6.l",  0, 0, 0, tcp_init, ntcp6_listen_print },
+    {"tcp6.c",  0, 0, 0, tcp_init, ntcp6_closing_print },
+    {"tcp6",    0, 0, 0, tcp_init, ntcp6_all_print },
+    {"tcp4.e",  0, 0, 0, tcp_init, ntcp4_established_print },
+    {"tcp4.l",  0, 0, 0, tcp_init, ntcp4_listen_print },
+    {"tcp4.c",  0, 0, 0, tcp_init, ntcp4_closing_print },
+    {"tcp4",    0, 0, 0, tcp_init, ntcp4_all_print },
 
     // color-foo
     {"coff",   0, 0, 0, no_init, color_off },

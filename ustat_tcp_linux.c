@@ -1,5 +1,5 @@
 
-static void _sum_counters(uint64_t* to, uint64_t* from, size_t l);
+static int _process_proc_tcp(int fd, int skip_fields, uint64_t* store, size_t lstore);
 
 //
 // fallback: in case we are not able to retrieve the socket stats
@@ -142,14 +142,14 @@ static int init_tcp_stats_via_proc_net_tcp() {
     _process_proc_tcp(fd, 3, _tcp4_counters, _n_tcp_states);
     close(fd);
 
-    _sum_counters(_tcp_counters, _tcp4_counters, _n_tcp_states);
+    _sum_counters(_tcp_counters, _tcp4_counters);
 
     // tcpv6, if available
     fd = open_read(tcpv6_name);
     if (fd > 0) {
         _process_proc_tcp(fd, 3, _tcp6_counters, _n_tcp_states);
         close(fd);
-        _sum_counters(_tcp_counters, _tcp6_counters, _n_tcp_states);
+        _sum_counters(_tcp_counters, _tcp6_counters);
     }
 
     return 1;
@@ -164,6 +164,7 @@ static int init_tcp_stats_via_proc_net_tcp() {
 // * http://kristrev.github.io/2013/07/26/passive-monitoring-of-sockets-on-linux/
 // * https://github.com/kristrev/inet-diag-example
 // * http://www.linuxjournal.com/article/7356
+// * https://github.com/collectd/collectd/blob/master/src/tcpconns.c
 
 #if USTAT_NETLINK
 
@@ -273,18 +274,6 @@ static int _request_tcp_diag(int sock, int family) {
 }
 
 #endif // USTAT_NETLINK
-
-// sum all elements from 'from[1-(l-1)]' into 'from[0] and
-// add 'from[i]' onto 'to[i]'
-static void _sum_counters(uint64_t* to, uint64_t* from, size_t l) {
-    size_t i;
-    for (i = 1; i < l; i++) {
-        from[0] += from[i];
-        to[i] += from[i];
-    }
-    to[0] += from[0];
-}
-
 
 static int init_tcp_stats() {
 
