@@ -10,7 +10,7 @@
 #include <sys/param.h>
 
 
-const size_t    _n_tcp_states = 12; // 11 + 1 to sum it up ('total')
+enum { _n_tcp_states = 12 }; // 11 + 1 to sum it up ('total')
 static uint64_t _tcp_counters[_n_tcp_states];
 static uint64_t _tcp4_counters[_n_tcp_states];
 static uint64_t _tcp6_counters[_n_tcp_states];
@@ -82,7 +82,7 @@ enum{
     TCP_CLOSE_WAIT,
     TCP_LAST_ACK,
     TCP_LISTEN,
-    TCP_CLOSING
+    TCP_CLOSING,
 
     TCP_STATE_FIRST = TCP_ESTABLISHED,
     TCP_STATE_LAST = TCP_CLOSING,

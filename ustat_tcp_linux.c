@@ -122,7 +122,7 @@ end:
 
 // the should-always-work method. maybe fast enough, but it takes ~0.2s to parse a 1mb 
 // /proc/net/tcp file with ~5k entries on a openvz-guest. it's noticable.
-static int init_tcp_stats_via_proc_net_tcp() {
+static int _init_tcp_stats_via_proc_net_tcp() {
 
     static const char tcpv4_name[] = "/proc/net/tcp";
     static const char tcpv6_name[] = "/proc/net/tcp6";
@@ -174,7 +174,7 @@ static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l, uint64_t* cou
 static const char error_no_netlink_to_kernel[] = "can't get netlink-socket from kernel\n";
 static const char error_no_tcp_diag[] = "can't get tcp-diag via netlink\n";
 
-static int init_tcp_stats_via_netlink() {
+static int _init_tcp_stats_via_netlink() {
 
     char                    done = 0;
     int                     sock = 0;
@@ -275,16 +275,16 @@ static int _request_tcp_diag(int sock, int family) {
 
 #endif // USTAT_NETLINK
 
-static int init_tcp_stats() {
+static int _init_tcp_stats() {
 
     int rc = 0;
 #if USTAT_NETLINK
     if (!getenv("FORCE_PROC_NET_TCP")) {
-        rc = init_tcp_stats_via_netlink();
+        rc = _init_tcp_stats_via_netlink();
     }
 #endif
     if (!rc) {
-        rc = init_tcp_stats_via_proc_net_tcp();
+        rc = _init_tcp_stats_via_proc_net_tcp();
     }
 
     return rc;
