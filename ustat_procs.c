@@ -33,9 +33,17 @@ int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 static int _get_number_active_processes(size_t* nproc) {
 
-    const int     mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PROC };
+    int           mib[] = {
+        CTL_KERN,
+        KERN_PROC,
+#if defined (__APPLE__)
+        KERN_PROC_ALL
+#else
+        KERN_PROC_PROC
+#endif
+    };
     const size_t  mibs = sizeof(mib)/sizeof(mib[0]);
-    size_t  val;
+    size_t        val;
 
     if (sysctl(mib, mibs, 0, &val, 0, 0) != 0) {
         return 0;
