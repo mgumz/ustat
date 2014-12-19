@@ -1,11 +1,7 @@
-
-// interesting read: 
 //
 // * http://src.gnu-darwin.org/src/usr.bin/sockstat/sockstat.c.html
-// * 
+// 
 
-
-#include <stdio.h>
 
 static int _init_tcp_stats() {
 
@@ -30,7 +26,6 @@ static int _init_tcp_stats() {
         goto out;
     }
 
-
     // check if what we got is complete
     xig = (struct xinpgen*)buf;
     end_xig = (struct xinpgen*)(void*)((char*)buf + l - sizeof(*end_xig));
@@ -54,7 +49,6 @@ static int _init_tcp_stats() {
             goto out;
         }
 
-        fprintf(stderr, "%x %x %x => %x\n", xtp->xt_inp.inp_vflag, INP_IPV4, INP_IPV6, xtp->xt_tp.t_state);
         if (xtp->xt_inp.inp_vflag & INP_IPV4) {
             _tcp4_counters[xtp->xt_tp.t_state]++;
         } else if (xtp->xt_inp.inp_vflag & INP_IPV6) {

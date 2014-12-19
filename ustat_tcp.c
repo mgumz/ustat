@@ -28,6 +28,7 @@ static void _sum_counters(uint64_t* to, uint64_t* from);
 #include <sys/sysctl.h>
 #include <netinet/in.h>
 #include <netinet/in_pcb.h>
+#include <netinet/tcp.h>
 #include <netinet/tcp_fsm.h>
 #include <netinet/tcp_var.h>
 #include <errno.h>
