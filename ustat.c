@@ -77,11 +77,6 @@ static struct ustat_module modules[] = {
     {"memh",    0, 0, 0, mem_init, mem_total_human_print },
     {"mem",     0, 0, 0, mem_init, mem_total_print },
 
-    {"tcpdump", 0, 0, 0, tcp_init, ntcp_print },
-    {"tcp.e",   0, 0, 0, tcp_init, ntcp_established_print },
-    {"tcp.l",   0, 0, 0, tcp_init, ntcp_listen_print },
-    {"tcp.c",   0, 0, 0, tcp_init, ntcp_closing_print },
-    {"tcp",     0, 0, 0, tcp_init, ntcp_all_print },
     {"tcp6.e",  0, 0, 0, tcp_init, ntcp6_established_print },
     {"tcp6.l",  0, 0, 0, tcp_init, ntcp6_listen_print },
     {"tcp6.c",  0, 0, 0, tcp_init, ntcp6_closing_print },
@@ -90,6 +85,11 @@ static struct ustat_module modules[] = {
     {"tcp4.l",  0, 0, 0, tcp_init, ntcp4_listen_print },
     {"tcp4.c",  0, 0, 0, tcp_init, ntcp4_closing_print },
     {"tcp4",    0, 0, 0, tcp_init, ntcp4_all_print },
+    {"tcpdump", 0, 0, 0, tcp_init, ntcp_print },
+    {"tcp.e",   0, 0, 0, tcp_init, ntcp_established_print },
+    {"tcp.l",   0, 0, 0, tcp_init, ntcp_listen_print },
+    {"tcp.c",   0, 0, 0, tcp_init, ntcp_closing_print },
+    {"tcp",     0, 0, 0, tcp_init, ntcp_all_print },
 
     // color-foo
     {"coff",   0, 0, 0, no_init, color_off },
