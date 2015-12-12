@@ -7,6 +7,7 @@ struct ustat_module;
 
 struct ustat_module {
     const char* name;
+    const char* descr;
     char ready;
     const size_t dlen;
     const void* data;

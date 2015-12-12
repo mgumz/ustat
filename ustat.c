@@ -59,59 +59,65 @@ static int no_init(struct ustat_module* m, const char* s, size_t l) {
 
 static struct ustat_module modules[] = {
     // pass-thru, skip str_len(m->name) bytes
-    {"",        0, 0, 0, no_init, pass_print },
-    {"%",       0, 0, 0, no_init, pass_print },
+    {"",        "",                       0, 0, 0, no_init, pass_print },
+    {"%",       "pass through",           0, 0, 0, no_init, pass_print },
+ 
+    {"load",    "system load",            0, 0, 0, load_init, load_print },
+    {"date",    "date, strftime",         0, 0, 0, no_init, date_print },
+    {"uid",     "render user id",         0, 0, 0, no_init, uid_print  },
+    {"user",    "render user name",       0, 0, 0, no_init, user_print },
+    {"nusers",  "number of active users", 0, 0, 0, nusers_init, nusers_print },
 
-    {"load",    0, 0, 0, load_init, load_print },
-    {"date",    0, 0, 0, no_init, date_print },
-    {"uid",     0, 0, 0, no_init, uid_print  },
-    {"user",    0, 0, 0, no_init, user_print },
-    {"nusers",  0, 0, 0, nusers_init, nusers_print },
+    {"nproc",   "number of processes",    0, 0, 0, no_init, nproc_print },
+    {"ncpus",   "number of cpus",         0, 0, 0, no_init, ncpus_print },
 
-    {"nproc",   0, 0, 0, no_init, nproc_print },
-    {"ncpus",   0, 0, 0, no_init, ncpus_print },
+    {"memfh",   "memory free, human",     0, 0, 0, mem_init, mem_free_human_print },
+    {"memf",    "memory free",            0, 0, 0, mem_init, mem_free_print },
+    {"memr",    "memory free, ratio",     0, 0, 0, mem_init, mem_ratio_print },
+    {"memh",    "memory total, human",    0, 0, 0, mem_init, mem_total_human_print },
+    {"mem",     "memory total",           0, 0, 0, mem_init, mem_total_print },
 
-    {"memfh",   0, 0, 0, mem_init, mem_free_human_print },
-    {"memf",    0, 0, 0, mem_init, mem_free_print },
-    {"memr",    0, 0, 0, mem_init, mem_ratio_print },
-    {"memh",    0, 0, 0, mem_init, mem_total_human_print },
-    {"mem",     0, 0, 0, mem_init, mem_total_print },
-
-    {"tcp6.e",  0, 0, 0, tcp_init, ntcp6_established_print },
-    {"tcp6.l",  0, 0, 0, tcp_init, ntcp6_listen_print },
-    {"tcp6.c",  0, 0, 0, tcp_init, ntcp6_closing_print },
-    {"tcp6",    0, 0, 0, tcp_init, ntcp6_all_print },
-    {"tcp4.e",  0, 0, 0, tcp_init, ntcp4_established_print },
-    {"tcp4.l",  0, 0, 0, tcp_init, ntcp4_listen_print },
-    {"tcp4.c",  0, 0, 0, tcp_init, ntcp4_closing_print },
-    {"tcp4",    0, 0, 0, tcp_init, ntcp4_all_print },
-    {"tcpdump", 0, 0, 0, tcp_init, ntcp_print },
-    {"tcp.e",   0, 0, 0, tcp_init, ntcp_established_print },
-    {"tcp.l",   0, 0, 0, tcp_init, ntcp_listen_print },
-    {"tcp.c",   0, 0, 0, tcp_init, ntcp_closing_print },
-    {"tcp",     0, 0, 0, tcp_init, ntcp_all_print },
+    {"tcp6.e",  "tcp6 established",       0, 0, 0, tcp_init, ntcp6_established_print },
+    {"tcp6.l",  "tcp6 listening",         0, 0, 0, tcp_init, ntcp6_listen_print },
+    {"tcp6.c",  "tcp6 closing",           0, 0, 0, tcp_init, ntcp6_closing_print },
+    {"tcp6",    "tcp6 total",             0, 0, 0, tcp_init, ntcp6_all_print },
+    {"tcp4.e",  "tcp4 established",       0, 0, 0, tcp_init, ntcp4_established_print },
+    {"tcp4.l",  "tcp4 listening",         0, 0, 0, tcp_init, ntcp4_listen_print },
+    {"tcp4.c",  "tcp4 closing",           0, 0, 0, tcp_init, ntcp4_closing_print },
+    {"tcp4",    "tcp4 total",             0, 0, 0, tcp_init, ntcp4_all_print },
+    {"tcpdump", "tcpdump",                0, 0, 0, tcp_init, ntcp_print },
+    {"tcp.e",   "tcp established",        0, 0, 0, tcp_init, ntcp_established_print },
+    {"tcp.l",   "tcp listening",          0, 0, 0, tcp_init, ntcp_listen_print },
+    {"tcp.c",   "tcp closing",            0, 0, 0, tcp_init, ntcp_closing_print },
+    {"tcp",     "tcp total",              0, 0, 0, tcp_init, ntcp_all_print },
 
     // color-foo
-    {"coff",   0, 0, 0, no_init, color_off },
-    {"8#",     0, 0, 0, no_init, color8_fg_normal_print },
-    {"8*",     0, 0, 0, no_init, color8_fg_bright_print },
-    {"B#",     0, 0, 0, no_init, color8_bg_normal_print },
-    {"B*",     0, 0, 0, no_init, color8_bg_bright_print },
-    {"256#",   0, 0, 0, no_init, xterm256_fg_print },
-    {"256*",   0, 0, 0, no_init, xterm256_bg_print },
-    {"rgb#",   0, 0, 0, no_init, rgb_fg_print },
-    {"rgb*",   0, 0, 0, no_init, rgb_bg_print },
+    {"coff",   "color off",               0, 0, 0, no_init, color_off },
+    {"8#",     "fg-color, normal",        0, 0, 0, no_init, color8_fg_normal_print },
+    {"8*",     "fg-color, bright",        0, 0, 0, no_init, color8_fg_bright_print },
+    {"B#",     "bg-color, normal",        0, 0, 0, no_init, color8_bg_normal_print },
+    {"B*",     "bg-color, bright",        0, 0, 0, no_init, color8_bg_bright_print },
+    {"256#",   "fg-color, 256colors",     0, 0, 0, no_init, xterm256_fg_print },
+    {"256*",   "bg-color, 256colors",     0, 0, 0, no_init, xterm256_bg_print },
+    {"rgb#",   "fg-color, rgb",           0, 0, 0, no_init, rgb_fg_print },
+    {"rgb*",   "bg-color, rgb",           0, 0, 0, no_init, rgb_bg_print },
 };
 static const size_t nmodules = sizeof(modules)/sizeof(struct ustat_module);
+
+int usage(void);
 
 // usage: ustat "load.1" ":" "load.2" ":" "load.3"
 int main(int argc, char* argv[]) {
 
     struct ustat_module** m = alloca(argc * sizeof(struct ustat_module*));
+    int i, j;
+
+    if (argc == 2 && str_diffn(argv[1], "-h", 2) == 0) {
+        return usage();
+    }
 
     // first, scan the given args and init() any module which is
     // not yet ready.
-    int i, j;
     for (i = 1; i < argc; i++) {
         for (j = 1; j < nmodules; j++) {
             if (str_start(argv[i], modules[j].name)) {
@@ -132,6 +138,17 @@ int main(int argc, char* argv[]) {
         m[i]->print(STDOUT_FILENO, m[i], argv[i], str_len(argv[i]));
     }
 
+    return 0;
+}
+
+int usage() {
+    int i;
+    for (i = 1; i < nmodules; i++) {
+        write(STDOUT_FILENO, modules[i].name, str_len(modules[i].name));
+        write(STDOUT_FILENO, "\t", 1);
+        write(STDOUT_FILENO, modules[i].descr, str_len(modules[i].descr));
+        write(STDOUT_FILENO, "\n", 1);
+    }
     return 0;
 }
 
