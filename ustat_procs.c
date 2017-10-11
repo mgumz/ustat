@@ -57,7 +57,7 @@ static int _get_number_active_processes(size_t* nproc) {
 #else
 
 // NOTES: sysinfo() yields strange results when called from
-// inside a openvz-container. that's why we travers /proc
+// inside a openvz-container. that's why we traverse /proc
 
 #include <sys/types.h>
 #include <dirent.h>

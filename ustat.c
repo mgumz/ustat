@@ -23,6 +23,15 @@ extern int mem_free_print(int, struct ustat_module*, const char*, size_t);
 extern int mem_free_human_print(int, struct ustat_module*, const char*, size_t);
 extern int mem_ratio_print(int, struct ustat_module*, const char*, size_t);
 
+extern int fs_init(struct ustat_module*, const char*, size_t);
+extern int fs_total_human_print(int, struct ustat_module*, const char*, size_t);
+extern int fs_total_print(int, struct ustat_module*, const char*, size_t);
+extern int fs_ratio_print(int, struct ustat_module*, const char*, size_t);
+extern int fs_free_human_print(int, struct ustat_module*, const char*, size_t);
+extern int fs_free_print(int, struct ustat_module*, const char*, size_t);
+extern int fs_used_human_print(int, struct ustat_module*, const char*, size_t);
+extern int fs_used_print(int, struct ustat_module*, const char*, size_t);
+
 extern int nproc_print(int, struct ustat_module*, const char*, size_t);
 extern int ncpus_print(int, struct ustat_module*, const char*, size_t);
 
@@ -77,6 +86,14 @@ static struct ustat_module modules[] = {
     {"memh",    "memory total, human",    0, 0, 0, mem_init, mem_total_human_print },
     {"mem",     "memory total",           0, 0, 0, mem_init, mem_total_print },
 
+    {"fsth",    "filesystem total, human",0, 0, 0, fs_init,  fs_total_human_print },
+    {"fst",     "filesystem total",       0, 0, 0, fs_init,  fs_total_print },
+    {"fsr",     "filesystem ratio",       0, 0, 0, fs_init,  fs_ratio_print },
+    {"fsfh",    "filesystem free, human", 0, 0, 0, fs_init,  fs_free_human_print },
+    {"fsf",     "filesystem free",        0, 0, 0, fs_init,  fs_free_print },
+    {"fsuh",    "filesystem used, human", 0, 0, 0, fs_init,  fs_used_human_print },
+    {"fsu",     "filesystem used",        0, 0, 0, fs_init,  fs_used_print },
+
     {"tcp6.e",  "tcp6 established",       0, 0, 0, tcp_init, ntcp6_established_print },
     {"tcp6.l",  "tcp6 listening",         0, 0, 0, tcp_init, ntcp6_listen_print },
     {"tcp6.c",  "tcp6 closing",           0, 0, 0, tcp_init, ntcp6_closing_print },
@@ -109,7 +126,8 @@ int usage(void);
 // usage: ustat "load.1" ":" "load.2" ":" "load.3"
 int main(int argc, char* argv[]) {
 
-    struct ustat_module** m = alloca(argc * sizeof(struct ustat_module*));
+    //struct ustat_module** m = alloca(argc * sizeof(struct ustat_module*));
+    struct ustat_module* m[argc];
     int i, j;
 
     if (argc == 2 && str_diffn(argv[1], "-h", 2) == 0) {
@@ -122,7 +140,13 @@ int main(int argc, char* argv[]) {
         for (j = 1; j < nmodules; j++) {
             if (str_start(argv[i], modules[j].name)) {
                 if (!modules[j].ready) {
-                    modules[j].init(&modules[j], argv[i], str_len(argv[i]));
+                    int rc = modules[j].init(&modules[j], argv[i], str_len(argv[i]));
+                    if (rc == 0) {
+                        const char error_cant_init_module[] = "\nerror init module \"";
+                        write(STDERR_FILENO, error_cant_init_module, sizeof(error_cant_init_module));
+                        write(STDERR_FILENO, modules[j].name, str_len(modules[j].name));
+                        os_exit(1, "\"");
+                    }
                 }
                 break;
             }

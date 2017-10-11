@@ -2,6 +2,7 @@
 #define _USTAT_H_
 
 #include <stddef.h>
+#include <stdint.h>
 
 struct ustat_module;
 
@@ -24,6 +25,7 @@ extern int first_n_fields(int out_fd, int fd, char sep, int n);
 extern void os_exit(int code, const char* msg);
 extern int read_double_from_fd(int fd, double* val);
 extern int write_double(int fd, double val, int prec);
+extern int write_8longlong(int fd, int64_t val);
 extern int write_8longlong_human(int fd, unsigned long long min, unsigned long long val);
 
 #endif

@@ -6,6 +6,7 @@ SET(ustat_src
     ustat_color.c
     ustat_cpu.c
     ustat_date.c
+    ustat_fs.c
     ustat_load.c
     ustat_mem.c
     ustat_tcp.c
@@ -17,6 +18,7 @@ SET(ustat_src
     ustat_helper/read_double_from_fd.c
     ustat_helper/scan_hex.c
     ustat_helper/write_8ll.c
+    ustat_helper/write_8ll_human.c
     ustat_helper/write_double.c
     djb/byte_copy.c djb/byte_zero.c
     djb/scan_ulong.c

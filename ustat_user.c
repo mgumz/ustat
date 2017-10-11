@@ -8,7 +8,6 @@
 #include <sys/types.h>
 #include <pwd.h>
 #include <utmpx.h>
-#include <stdio.h>
 
 
 int user_print(int fd, struct ustat_module* m, const char* s, size_t l) {
