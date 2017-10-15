@@ -1,4 +1,4 @@
-PROJECT(ustat)
+PROJECT(ustat C)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 SET(ustat_src
