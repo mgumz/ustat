@@ -4,7 +4,6 @@ SRC=ustat.c \
 	ustat_date.c \
 	ustat_load.c \
 	ustat_mem.c \
-	ustat_nof.c \
 	ustat_pass.c \
 	ustat_procs.c \
 	ustat_tcp.c \
@@ -13,8 +12,8 @@ SRC=ustat.c \
 	ustat_helper/os_exit.c \
 	ustat_helper/read_double_from_fd.c \
 	ustat_helper/scan_hex.c \
-	ustat_helper/write_ulong.c \
 	ustat_helper/write_8ll.c \
+	ustat_helper/write_8ll_human.c \
 	ustat_helper/write_double.c \
 	djb/byte_copy.c djb/byte_zero.c \
 	djb/scan_ulong.c \
@@ -22,5 +21,14 @@ SRC=ustat.c \
 	djb/open_read.c \
 	djb/fmt_ulong.c
 
-ustat:
+ustat: $(SRC)
+	gcc -Os -o $@ -I. -Idjb $(SRC)
+
+ustat.debug: $(SRC)
+	gcc -g -o $@ -I. -Idjb $(SRC)
+
+ustat.diet: $(SRC)
 	diet -Os gcc -o $@ -I. -Idjb $(SRC)
+
+docker-image:
+	docker build -t ustat-dev -f docker/Dockerfile .
