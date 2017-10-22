@@ -181,7 +181,7 @@ int ntcp_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 int static _print(int fd, uint64_t val) {
     int n = fmt_8longlong(0, val);
-    char* buf = alloca(n);
+    char buf[n];
     fmt_8longlong(buf, val);
     write(fd, buf, n);
     return 1;

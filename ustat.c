@@ -126,7 +126,6 @@ int usage(void);
 // usage: ustat "load.1" ":" "load.2" ":" "load.3"
 int main(int argc, char* argv[]) {
 
-    //struct ustat_module** m = alloca(argc * sizeof(struct ustat_module*));
     struct ustat_module* m[argc];
     int i, j;
 

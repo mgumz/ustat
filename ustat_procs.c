@@ -12,13 +12,12 @@ static int _get_number_active_processes(size_t* nproc);
 int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
     size_t  nproc = 0;
-    char*   buf;
     int     n;
 
     _get_number_active_processes(&nproc);
 
     n = fmt_ulong(0, nproc);
-    buf = alloca(n);
+    char buf[n];
     fmt_ulong(buf, nproc);
     write(fd, buf, n);
 
