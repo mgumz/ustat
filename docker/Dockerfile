@@ -1,14 +1,19 @@
-FROM debian:stretch
+FROM debian:buster AS base-env
 
 RUN  apt update && \
-     apt install -y --no-install-recommends \
+     apt dist-upgrade -y
+RUN  apt install -y --no-install-recommends \
         cmake \
         dietlibc-dev \
         gcc \
         gdb \
         libc-dev \
-        libgcc-6-dev \
         libowfat-dietlibc-dev \
-        make ustat.diet
+        make
 
+FROM base-env AS build-env
+
+COPY . /src/
+
+RUN  cd /src/ && make ustat.diet
 
