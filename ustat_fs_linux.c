@@ -6,8 +6,6 @@
 #include <sys/types.h>
 #include <sys/statvfs.h>
 
-#include <stdio.h>
-
 static int _add_mount_entry(struct ustat_fs* fs[], size_t* fs_n, const char* mnt, size_t l);
 static int _get_total_free(const char* p, int64_t* n_total, int64_t* n_free);
 

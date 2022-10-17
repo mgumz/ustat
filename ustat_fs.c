@@ -18,6 +18,8 @@
 // fst/                 - total of / fileystem
 // fst/other/mountpoint - total of /other/mountpoint
 // 
+// TODO: https://stackoverflow.com/questions/18600377/detecting-mounted-drives-on-linux-and-mac-os-x/18600640#18600640
+// https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/getfsstat.2.html
 
 struct ustat_fs;
 
@@ -37,12 +39,11 @@ struct ustat_fs* _fs = 0x0;
 
 int fs_init(struct ustat_module *m, const char* s, size_t l) {
 
-    if (_fs != 0x0) {
+    if (_fs != 0x0 || m->ready == 1) {
         return 1;
     }
 
     _fs_init_platform(&_fs, &_fs_n);
-
 
     if (_fs == 0x0) {
        write(STDERR_FILENO, error_no_fs_entries, sizeof(error_no_fs_entries));
@@ -53,19 +54,12 @@ int fs_init(struct ustat_module *m, const char* s, size_t l) {
     return 1;
 }
 
-#include <stdio.h>
-
 #if defined(__linux__)
 #include <sys/statfs.h>
-#endif
-#if defined(__linux__)
 #include "ustat_fs_linux.c"
 #else
 #include "ustat_fs_other.c"
 #endif
-
-
-
 
 static struct ustat_fs* _fs_select(struct ustat_module* m, struct ustat_fs* fs, size_t n_fs, const char* s, size_t l) {
     struct ustat_fs* f = &fs[0];
@@ -77,9 +71,11 @@ static struct ustat_fs* _fs_select(struct ustat_module* m, struct ustat_fs* fs, 
     size_t id_l = l - off;
     size_t i;
     for (i = 0; i < n_fs; i++) {
-        const size_t n = (id_l < fs[i].id_l ? id_l : fs[i].id_l);
-        if (str_diffn(id, fs[i].id, n) == 0) {
-           return &fs[i];
+        if (id_l != fs[i].id_l) {
+            continue;
+        }
+        if (str_diffn(id, fs[i].id, id_l) == 0) {
+            return &fs[i];
         }
     }
     return f;
