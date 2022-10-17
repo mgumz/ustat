@@ -56,7 +56,7 @@ int read_double_from_fd(int fd, double* val) {
         }
         pos += read(fd, &c, 1);
     }
-    v = (double)n * (1.0 / (double)l);
+    v += (double)n * (1.0 / (double)l);
 
 finish:
     v *= (double)sign;
