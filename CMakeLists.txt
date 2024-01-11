@@ -3,6 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.20)
 
 SET(ustat_src
     ustat.c
+    ustat_battery.c
     ustat_color.c
     ustat_cpu.c
     ustat_date.c
@@ -42,3 +43,8 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
 ADD_EXECUTABLE(ustat ${ustat_src})
+
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    TARGET_LINK_LIBRARIES(ustat PUBLIC "-framework IOKit -framework CoreFoundation")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+

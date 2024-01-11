@@ -36,6 +36,11 @@ extern int fs_used_print(int, struct ustat_module*, const char*, size_t);
 extern int nproc_print(int, struct ustat_module*, const char*, size_t);
 extern int ncpus_print(int, struct ustat_module*, const char*, size_t);
 
+extern int bat_init(struct ustat_module*, const char*, size_t);
+extern int bat_level_print(int, struct ustat_module*, const char*, size_t);
+extern int bat_charging_print(int, struct ustat_module*, const char*, size_t);
+extern int bat_charging_human_print(int, struct ustat_module*, const char*, size_t);
+
 extern int tcp_init(struct ustat_module*, const char*, size_t);
 extern int ntcp_all_print(int, struct ustat_module*, const char*, size_t);
 extern int ntcp_closing_print(int, struct ustat_module*, const char*, size_t);
@@ -81,6 +86,10 @@ static struct ustat_module modules[] = {
 
     {"nproc",   "number of processes",    0, 0, 0, no_init, nproc_print },
     {"ncpus",   "number of cpus",         0, 0, 0, no_init, ncpus_print },
+
+    {"bat%",    "battery level",          0, 0, 0, bat_init, bat_level_print },
+    {"bat+h",   "battery charging, human", 0, 0, 0, bat_init, bat_charging_human_print },
+    {"bat+",    "battery charging",       0, 0, 0, bat_init, bat_charging_print },
 
     {"memfh",   "memory free, human",     0, 0, 0, mem_init, mem_free_human_print },
     {"memf",    "memory free",            0, 0, 0, mem_init, mem_free_print },

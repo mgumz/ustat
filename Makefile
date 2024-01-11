@@ -1,6 +1,7 @@
 CC ?= gcc
 CFLAGS ?=
 SRC=ustat.c \
+	ustat_battery.c \
 	ustat_color.c \
 	ustat_cpu.c \
 	ustat_date.c \
