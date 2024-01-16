@@ -9,6 +9,7 @@
 //
 // modules
 extern int pass_print(int, struct ustat_module*, const char*, size_t);
+extern int nl_print(int, struct ustat_module*, const char*, size_t);
 extern int load_init(struct ustat_module*, const char*, size_t);
 extern int load_print(int, struct ustat_module*, const char*, size_t);
 extern int date_print(int, struct ustat_module*, const char*, size_t);
@@ -70,6 +71,7 @@ static struct ustat_module modules[] = {
     // pass-thru, skip str_len(m->name) bytes
     {"",        "",                       0, 0, 0, no_init, pass_print },
     {"%",       "pass through",           0, 0, 0, no_init, pass_print },
+    {"nl",      "newline",                0, 0, 0, no_init, nl_print },
  
     {"load",    "system load",            0, 0, 0, load_init, load_print },
     {"date",    "date, strftime",         0, 0, 0, no_init, date_print },

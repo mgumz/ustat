@@ -12,6 +12,7 @@ SET(ustat_src
     ustat_tcp.c
     ustat_pass.c
     ustat_procs.c
+    ustat_spec.c
     ustat_user.c
     ustat_helper/fmt_8ll.c
     ustat_helper/os_exit.c

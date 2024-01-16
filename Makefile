@@ -7,6 +7,7 @@ SRC=ustat.c \
 	ustat_mem.c \
 	ustat_pass.c \
 	ustat_procs.c \
+	ustat_spec.c \
 	ustat_tcp.c \
 	ustat_user.c \
 	ustat_helper/fmt_8ll.c \
