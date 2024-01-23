@@ -10,7 +10,7 @@
 static int _fs_init_platform(struct ustat_fs* fs[], size_t* fs_n) {
 
     struct statfs* buf;
-    int n = getmntinfo(&buf, MNT_WAIT);
+    int n = getmntinfo(&buf, 0);
     if (n == 0) {
         return -1;
     }
