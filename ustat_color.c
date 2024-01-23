@@ -103,7 +103,7 @@ static const char XTERM_RGB_BG[] = "\x1b[48;2;";
 static int rgb_print(int fd, struct ustat_module* m, const char* s, size_t l,
     const char* mode, size_t ml) {
 
-    unsigned long r = 0, g = 0, b = 0;
+    uint32_t r = 0, g = 0, b = 0;
     int i;
     size_t off = str_len(m->name);
     size_t n = l - off;

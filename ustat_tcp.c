@@ -180,9 +180,9 @@ int ntcp_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 //
 
 int static _print(int fd, uint64_t val) {
-    int n = fmt_8longlong(0, val);
+    int n = fmt_uint64(0, val);
     char buf[n];
-    fmt_8longlong(buf, val);
+    fmt_uint64(buf, val);
     write(fd, buf, n);
     return 1;
 }

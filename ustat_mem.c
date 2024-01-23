@@ -38,8 +38,8 @@ int mem_init(struct ustat_module* m, const char* s, size_t l) {
 #endif
 
 static int mem_print(int fd, uint64_t val) {
-    char buf[32];
-    int n = fmt_8longlong(buf, val);
+    char buf[FMT_ULONG];
+    int n = fmt_uint64(buf, val);
     write(fd, buf, n);
     return 1;
 }
@@ -53,11 +53,11 @@ int mem_free_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 }
 
 int mem_total_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
-    return write_8longlong_human(fd, 1, _mem_total);
+    return write_uint64_human(fd, 1, _mem_total);
 }
 
 int mem_free_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
-    return write_8longlong_human(fd, 1, _mem_free);
+    return write_uint64_human(fd, 1, _mem_free);
 }
 
 int mem_ratio_print(int fd, struct ustat_module* m, const char* s, size_t l) {

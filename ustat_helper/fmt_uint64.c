@@ -1,6 +1,7 @@
 #include <stddef.h>
+#include <stdint.h>
 
-int fmt_8longlong(char* s, unsigned long long val) {
+int fmt_uint64(char* s, uint64_t val) {
 
     size_t l;
     unsigned long long v = val;

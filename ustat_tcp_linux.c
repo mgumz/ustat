@@ -47,7 +47,7 @@ static int _process_proc_tcp(int fd, int state_field, uint64_t* store, size_t ls
 
     int rc = 0;
     struct buffered_byte_reader r = {.pos = 0, .end = 0};
-    unsigned long val;
+    uint32_t val;
 
     // skip first line by treating it as any other line behind the 'state'
     // field
@@ -134,9 +134,9 @@ static int _init_tcp_stats_via_proc_net_tcp() {
         return 0;
     }
 
-    byte_zero(_tcp_counters, sizeof(_tcp_counters));
-    byte_zero(_tcp4_counters, sizeof(_tcp4_counters));
-    byte_zero(_tcp6_counters, sizeof(_tcp6_counters));
+    byte_zero((char*)_tcp_counters, sizeof(_tcp_counters));
+    byte_zero((char*)_tcp4_counters, sizeof(_tcp4_counters));
+    byte_zero((char*)_tcp6_counters, sizeof(_tcp6_counters));
 
     // tcpv4
     _process_proc_tcp(fd, 3, _tcp4_counters, _n_tcp_states);
