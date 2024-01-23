@@ -1,3 +1,5 @@
+CC ?= gcc
+CFLAGS ?=
 SRC=ustat.c \
 	ustat_color.c \
 	ustat_cpu.c \
@@ -24,10 +26,10 @@ SRC=ustat.c \
 	djb/fmt_ulong.c
 
 ustat: $(SRC)
-	gcc -Os -o $@ -I. -Idjb $(SRC)
+	$(CC) $(CFLAGS) -Os -o $@ -I. -Idjb $(SRC)
 
 ustat.debug: $(SRC)
-	gcc -g -o $@ -I. -Idjb $(SRC)
+	$(CC) -g -o $@ -I. -Idjb $(SRC)
 
 ustat.diet: $(SRC) ustat_fs_linux.c ustat_tcp_linux.c
 	diet -Os gcc -o $@ -I. -Idjb $(SRC)
