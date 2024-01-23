@@ -1,9 +1,7 @@
+#include "ustat_fs.h"
+
 #include "djb/str.h"
 #include "djb/byte.h"
-
-#include <stdint.h>
-#include <stdlib.h>
-
 
 #include <sys/param.h>
 #include <sys/ucred.h>
@@ -28,7 +26,7 @@ static int _fs_init_platform(struct ustat_fs* fs[], size_t* fs_n) {
 
         f[i].id = s;
         f[i].id_l = l;
-        f[i].n_free = sf->f_bavail * sf->f_bsize;
+        f[i].n_free = sf->f_bfree * sf->f_bsize;
         f[i].n_total = sf->f_blocks * sf->f_bsize;
     }
 

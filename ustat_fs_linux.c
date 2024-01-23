@@ -1,3 +1,5 @@
+#include "ustat_fs.h"
+
 #include "djb/open.h"
 #include "djb/byte.h"
 #include "djb/str.h"
@@ -151,8 +153,8 @@ static int _get_total_free(const char* p, int64_t* n_total, int64_t* n_free) {
 
     struct statvfs buf;
     if (statvfs(p, &buf) == 0) {
-        *n_total = buf.f_blocks * buf.f_bsize;
-        *n_free = buf.f_bfree * buf.f_bsize;
+        *n_total = buf.f_blocks * buf.f_frsize;
+        *n_free = buf.f_bfree * buf.f_frsize;
     }
 
     return 1;

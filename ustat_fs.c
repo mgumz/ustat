@@ -1,7 +1,10 @@
+#include "ustat_fs.h"
 #include "ustat.h"
+
 #include "djb/str.h"
 #include "djb/byte.h"
 #include "djb/open.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -21,18 +24,9 @@
 // TODO: https://stackoverflow.com/questions/18600377/detecting-mounted-drives-on-linux-and-mac-os-x/18600640#18600640
 // https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/getfsstat.2.html
 
-struct ustat_fs;
-
-struct ustat_fs {
-    const char* id;
-    size_t  id_l;
-    int64_t n_free;
-    int64_t n_total;
-};
-
 static const char error_no_fs_entries[] = "can't get a fs entry via getfsent(3)";
 
-static int _fs_init_platform();
+static int _fs_init_platform(struct ustat_fs* fs[], size_t* fs_n);
 
 size_t _fs_n = 0;
 struct ustat_fs* _fs = 0x0;
@@ -83,33 +77,33 @@ static struct ustat_fs* _fs_select(struct ustat_module* m, struct ustat_fs* fs, 
 
 int fs_total_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     struct ustat_fs* fs = _fs_select(m, _fs, _fs_n, s, l);
-    return write_8longlong(fd, fs->n_total);
+    return write_uint64(fd, fs->n_total);
 }
 
 int fs_total_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     struct ustat_fs* fs = _fs_select(m, _fs, _fs_n, s, l);
-    return write_8longlong_human(fd, 1, fs->n_total);
+    return write_uint64_human(fd, 1, fs->n_total);
 }
 
 
 int fs_free_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     struct ustat_fs* fs = _fs_select(m, _fs, _fs_n, s, l);
-    return write_8longlong(fd, fs->n_free);
+    return write_uint64(fd, fs->n_free);
 }
 
 int fs_free_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     struct ustat_fs* fs = _fs_select(m, _fs, _fs_n, s, l);
-    return write_8longlong_human(fd, 1, fs->n_free);
+    return write_uint64_human(fd, 1, fs->n_free);
 }
 
 int fs_used_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     struct ustat_fs* fs = _fs_select(m, _fs, _fs_n, s, l);
-    return write_8longlong(fd, fs->n_total - fs->n_free);
+    return write_uint64(fd, fs->n_total - fs->n_free);
 }
 
 int fs_used_human_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     struct ustat_fs* fs = _fs_select(m, _fs, _fs_n, s, l);
-    return write_8longlong_human(fd, 1, fs->n_total - fs->n_free);
+    return write_uint64_human(fd, 1, fs->n_total - fs->n_free);
 }
 
 int fs_ratio_print(int fd, struct ustat_module* m, const char* s, size_t l) {
