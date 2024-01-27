@@ -26,12 +26,17 @@ int bat_init(struct ustat_module* m, const char* s, size_t l) {
 }
 
 #if defined(__APPLE__)
-#include "ustat_battery_osx.c"
+# include "ustat_battery_osx.c"
 #else
+# if defined(__linux__)
+#  include <sys/statfs.h>
+#  include "ustat_battery_linux.c"
+# else
 static int _get_battery_info(struct ustat_battery* bi) {
     // TODO: implement
     return 0;
 }
+# endif
 #endif
 
 int bat_level_print(int fd, uint64_t val) {
