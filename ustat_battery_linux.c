@@ -1,6 +1,6 @@
+#include "djb/open.h"
 #include "djb/scan.h"
 #include "djb/str.h"
-#include "djb/open.h"
 
 #include <sys/types.h>
 #include <unistd.h>
@@ -9,15 +9,14 @@
 
 static int _get_battery_info(struct ustat_battery* bi) {
 
-    const char STATUS_FILE[]   = "/sys/class/power_supply/BAT0/status";
+    const char STATUS_FILE[] = "/sys/class/power_supply/BAT0/status";
     const char CAPACITY_FILE[] = "/sys/class/power_supply/BAT0/capacity";
-    
+
     // STATUS_FILE:   "Charging\n" or "Discharging\n"
     // CAPACITY_FILE: "100\n"
     const size_t MAX_BYTES = 32;
 
     const char CHARGING_MARKER[] = "Charging";
-
 
     // read status: charging | discharging
     // (no status file? no battery -> exit)
@@ -31,7 +30,7 @@ static int _get_battery_info(struct ustat_battery* bi) {
     size_t n = read(fd, buf, sizeof(buf));
     buf[n] = 0x0;
     close(fd);
-    
+
     if (str_start(buf, CHARGING_MARKER)) {
         bi->is_charging = 1;
     }

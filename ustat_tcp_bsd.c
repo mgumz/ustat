@@ -1,19 +1,17 @@
 //
 // * http://src.gnu-darwin.org/src/usr.bin/sockstat/sockstat.c.html
-// 
-
+//
 
 static int _init_tcp_stats() {
 
     static const char name[] = "net.inet.tcp.pcblist";
 
-    int             rc = 0;
-    void*           buf = 0;
-    size_t          l;
+    int rc = 0;
+    void* buf = 0;
+    size_t l;
     struct xinpgen* xig;
     struct xinpgen* end_xig;
-    struct xtcpcb*  xtp;
-
+    struct xtcpcb* xtp;
 
     // allocate as much ram as sysctl demands
     if (sysctlbyname(name, 0, &l, 0, 0) != 0) {
@@ -36,7 +34,7 @@ static int _init_tcp_stats() {
 
     // xig->xig_gen != exig->xig_gen -> inconsitent data
 
-    for ( ;; ) {
+    for (;;) {
 
         xig = (struct xinpgen*)(void*)((char*)xig + xig->xig_len);
         if (xig >= end_xig) {
@@ -68,4 +66,3 @@ out:
 
     return rc;
 }
-

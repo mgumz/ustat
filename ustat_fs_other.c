@@ -1,11 +1,11 @@
 #include "ustat_fs.h"
 
-#include "djb/str.h"
 #include "djb/byte.h"
+#include "djb/str.h"
 
+#include <sys/mount.h>
 #include <sys/param.h>
 #include <sys/ucred.h>
-#include <sys/mount.h>
 
 static int _fs_init_platform(struct ustat_fs* fs[], size_t* fs_n) {
 
@@ -35,4 +35,3 @@ static int _fs_init_platform(struct ustat_fs* fs[], size_t* fs_n) {
 
     return 1;
 }
-

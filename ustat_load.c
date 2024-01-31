@@ -1,12 +1,9 @@
 #include "ustat.h"
 
-#include <unistd.h>
-#include <stdlib.h>
 #include <sys/param.h>
+#include <unistd.h>
 
-
-static double _load[3] = {-1.0, -1.0, -1.0 };
-
+static double _load[3] = {-1.0, -1.0, -1.0};
 
 static int _get_loadavg(double load[3]);
 
@@ -29,11 +26,9 @@ int load_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     return 1;
 }
 
-
-
 #if defined(BSD)
-#include <sys/sysctl.h>
 #include <sys/resource.h>
+#include <sys/sysctl.h>
 #include <sys/types.h>
 #ifndef VM_LOADAVG
 #include <vm/vm_param.h>
@@ -43,10 +38,10 @@ static int _get_loadavg(double load[3]) {
 
     struct loadavg l;
     size_t lsize = sizeof(l);
-    int nelems =   sizeof(l.ldavg)/sizeof(fixpt_t);
-    int            i;
-    int            mib[2] = {CTL_VM, VM_LOADAVG};
-    double         v;
+    int nelems = sizeof(l.ldavg) / sizeof(fixpt_t);
+    int i;
+    int mib[2] = {CTL_VM, VM_LOADAVG};
+    double v;
 
     if (sysctl(mib, 2, &l, &lsize, 0, 0) != 0) {
         return 0;
@@ -79,6 +74,4 @@ static int _get_loadavg(double load[3]) {
     return 1;
 }
 
-
 #endif
-

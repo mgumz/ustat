@@ -1,9 +1,10 @@
-#include "ustat.h"
 #include "djb/str.h"
-#include <unistd.h>
-#include <time.h>
-#include <sys/time.h>
+#include "ustat.h"
+
 #include <stdint.h>
+#include <sys/time.h>
+#include <time.h>
+#include <unistd.h>
 
 static const uint64_t MICRO_SECS = 1000L * 1000L;
 

@@ -1,18 +1,17 @@
 #include "ustat.h"
-#include "djb/fmt.h"
-#include <stddef.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <unistd.h>
-#include <sys/param.h>
 
+#include "djb/fmt.h"
+
+#include <stddef.h>
+#include <sys/param.h>
+#include <unistd.h>
 
 static int _get_number_active_processes(size_t* nproc);
 
 int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
-    size_t  nproc = 0;
-    int     n;
+    size_t nproc = 0;
+    int n;
 
     _get_number_active_processes(&nproc);
 
@@ -24,7 +23,6 @@ int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
     return 1;
 }
 
-
 #if defined(BSD)
 
 #include <sys/sysctl.h>
@@ -32,23 +30,23 @@ int nproc_print(int fd, struct ustat_module* m, const char* s, size_t l) {
 
 static int _get_number_active_processes(size_t* nproc) {
 
-    int           mib[] = {
+    int mib[] = {
         CTL_KERN,
         KERN_PROC,
-#if defined (__APPLE__)
+#if defined(__APPLE__)
         KERN_PROC_ALL
 #else
         KERN_PROC_PROC
 #endif
     };
-    const size_t  mibs = sizeof(mib)/sizeof(mib[0]);
-    size_t        val;
+    const size_t mibs = sizeof(mib) / sizeof(mib[0]);
+    size_t val;
 
     if (sysctl(mib, mibs, 0, &val, 0, 0) != 0) {
         return 0;
     }
 
-    *nproc  = val / sizeof(struct kinfo_proc);
+    *nproc = val / sizeof(struct kinfo_proc);
 
     return 1;
 }
@@ -58,8 +56,8 @@ static int _get_number_active_processes(size_t* nproc) {
 // NOTES: sysinfo() yields strange results when called from
 // inside a openvz-container. that's why we traverse /proc
 
-#include <sys/types.h>
 #include <dirent.h>
+#include <sys/types.h>
 static int _get_number_active_processes(size_t* nproc) {
 
     size_t val = 0;
@@ -85,4 +83,3 @@ static int _get_number_active_processes(size_t* nproc) {
 }
 
 #endif
-

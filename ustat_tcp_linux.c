@@ -1,5 +1,6 @@
 
-static int _process_proc_tcp(int fd, int skip_fields, uint64_t* store, size_t lstore);
+static int _process_proc_tcp(int fd, int skip_fields, uint64_t* store,
+                             size_t lstore);
 
 //
 // fallback: in case we are not able to retrieve the socket stats
@@ -8,20 +9,20 @@ static int _process_proc_tcp(int fd, int skip_fields, uint64_t* store, size_t ls
 //
 // 'ss' (iproute2) and 'netstat' do it similar
 
-struct buffered_byte_reader  {
-    char    prev;
-    char    cur;
+struct buffered_byte_reader {
+    char prev;
+    char cur;
 
-    int     field;
-    int     pos; // position in buf
-    int     end; // end-position in buf
-    size_t  consumed;
+    int field;
+    int pos; // position in buf
+    int end; // end-position in buf
+    size_t consumed;
     ssize_t err;
 
     // 16k buffer. why? because /proc/net/tcp get's quite 'huge', for moderate
     // traffic it's in the range of 'megabyte'. parsing that file in 16k
     // blocks yields 'best' speed vs use or ram
-    char    buf[16 * 1024];
+    char buf[16 * 1024];
 };
 
 static int _read_byte(int fd, struct buffered_byte_reader* br) {
@@ -43,7 +44,8 @@ static int _read_byte(int fd, struct buffered_byte_reader* br) {
     return 0;
 }
 
-static int _process_proc_tcp(int fd, int state_field, uint64_t* store, size_t lstore) {
+static int _process_proc_tcp(int fd, int state_field, uint64_t* store,
+                             size_t lstore) {
 
     int rc = 0;
     struct buffered_byte_reader r = {.pos = 0, .end = 0};
@@ -52,7 +54,7 @@ static int _process_proc_tcp(int fd, int state_field, uint64_t* store, size_t ls
     // skip first line by treating it as any other line behind the 'state'
     // field
 seek_to_eol:
-    for ( ; _read_byte(fd, &r); ) {
+    for (; _read_byte(fd, &r);) {
         if (r.err) {
             goto end;
         }
@@ -63,7 +65,7 @@ seek_to_eol:
     goto end;
 
 skip_leading_ws:
-    for ( ; _read_byte(fd, &r) ; ) {
+    for (; _read_byte(fd, &r);) {
         if (r.err) {
             goto end;
         }
@@ -76,7 +78,7 @@ skip_leading_ws:
 skip_n_fields:
     r.field = 0;
     r.prev = r.cur;
-    for ( ; r.field < state_field && _read_byte(fd, &r); ) {
+    for (; r.field < state_field && _read_byte(fd, &r);) {
         if (r.err) {
             goto end;
         }
@@ -118,17 +120,15 @@ end:
     return rc;
 }
 
-
-
-// the should-always-work method. maybe fast enough, but it takes ~0.2s to parse a 1mb 
-// /proc/net/tcp file with ~5k entries on a openvz-guest. it's noticable.
+// the should-always-work method. maybe fast enough, but it takes ~0.2s to parse
+// a 1mb /proc/net/tcp file with ~5k entries on a openvz-guest. it's noticable.
 static int _init_tcp_stats_via_proc_net_tcp() {
 
     static const char tcpv4_name[] = "/proc/net/tcp";
     static const char tcpv6_name[] = "/proc/net/tcp6";
 
-    int          i;
-    int          fd = open_read(tcpv4_name);
+    int i;
+    int fd = open_read(tcpv4_name);
 
     if (fd < 0) { // not on linux? huh?
         return 0;
@@ -155,7 +155,6 @@ static int _init_tcp_stats_via_proc_net_tcp() {
     return 1;
 }
 
-
 // maybe a faster approach to get the stats of the tcp-sockets: netlink to the
 // kernel.
 //
@@ -169,25 +168,28 @@ static int _init_tcp_stats_via_proc_net_tcp() {
 #if USTAT_NETLINK
 
 static int _request_tcp_diag(int sock, int family);
-static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l, uint64_t* counter);
+static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l,
+                                 uint64_t* counter);
 
-static const char error_no_netlink_to_kernel[] = "can't get netlink-socket from kernel\n";
+static const char error_no_netlink_to_kernel[] =
+    "can't get netlink-socket from kernel\n";
 static const char error_no_tcp_diag[] = "can't get tcp-diag via netlink\n";
 
 static int _init_tcp_stats_via_netlink() {
 
-    char                    done = 0;
-    int                     sock = 0;
-    uint8_t                 buf[4096]; // TODO: use page-size here
-    uint64_t                rc = 0;
+    char done = 0;
+    int sock = 0;
+    uint8_t buf[4096]; // TODO: use page-size here
+    uint64_t rc = 0;
 
-    if((sock = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)) == -1){
-        write(STDERR_FILENO, error_no_netlink_to_kernel, sizeof(error_no_netlink_to_kernel));
+    if ((sock = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_INET_DIAG)) == -1) {
+        write(STDERR_FILENO, error_no_netlink_to_kernel,
+              sizeof(error_no_netlink_to_kernel));
         return 0;
     }
 
     // try ipv4
-    if(_request_tcp_diag(sock, AF_INET) < 0){
+    if (_request_tcp_diag(sock, AF_INET) < 0) {
         write(STDERR_FILENO, error_no_tcp_diag, sizeof(error_no_tcp_diag));
         return 0;
     }
@@ -195,7 +197,7 @@ static int _init_tcp_stats_via_netlink() {
     if (_count_tcp_states(sock, buf, sizeof(buf), _tcp4_counters) >= 0) {
         _sum_counters(_tcp_counters, _tcp4_counters, _n_tcp_states);
         rc = 1;
-        if(_request_tcp_diag(sock, AF_INET6) >= 0) {
+        if (_request_tcp_diag(sock, AF_INET6) >= 0) {
             _count_tcp_states(sock, buf, sizeof(buf), _tcp6_counters);
             _sum_counters(_tcp_counters, _tcp6_counters, _n_tcp_states);
         }
@@ -205,19 +207,20 @@ static int _init_tcp_stats_via_netlink() {
     return rc;
 }
 
-static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l, uint64_t* counter) {
+static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l,
+                                 uint64_t* counter) {
 
     struct inet_diag_msg* msg;
-    const size_t          msg_size = sizeof(*msg);
-    char                  done;
-    int64_t               i = 0;
+    const size_t msg_size = sizeof(*msg);
+    char done;
+    int64_t i = 0;
 
-    for (done = 0; !done ; ) {
+    for (done = 0; !done;) {
 
-        int              n = recv(sock, buf, l, 0);
+        int n = recv(sock, buf, l, 0);
         struct nlmsghdr* hdr = (struct nlmsghdr*)buf;
 
-        for ( ;NLMSG_OK(hdr, n); ) {
+        for (; NLMSG_OK(hdr, n);) {
             if (hdr->nlmsg_type == NLMSG_DONE) {
                 done = 1;
                 break;
@@ -236,15 +239,14 @@ static int64_t _count_tcp_states(int sock, uint8_t* buf, size_t l, uint64_t* cou
     return i;
 }
 
-
 static int _request_tcp_diag(int sock, int family) {
 
-    struct msghdr           msg;
-    struct nlmsghdr         nlh;
+    struct msghdr msg;
+    struct nlmsghdr nlh;
     struct inet_diag_req_v2 c_req;
-    struct sockaddr_nl      sa;
-    struct rtattr           rta;
-    struct iovec            iov[4];
+    struct sockaddr_nl sa;
+    struct rtattr rta;
+    struct iovec iov[4];
 
     byte_zero(&msg, sizeof(msg));
     byte_zero(&nlh, sizeof(nlh));
@@ -257,7 +259,7 @@ static int _request_tcp_diag(int sock, int family) {
     c_req.idiag_states = 0xfff; // 'TCPF_ALL'
 
     nlh.nlmsg_len = NLMSG_LENGTH(sizeof(c_req));
-    nlh.nlmsg_flags = NLM_F_DUMP|NLM_F_REQUEST;
+    nlh.nlmsg_flags = NLM_F_DUMP | NLM_F_REQUEST;
     nlh.nlmsg_type = SOCK_DIAG_BY_FAMILY;
 
     iov[0].iov_base = (void*)&nlh;
@@ -289,4 +291,3 @@ static int _init_tcp_stats() {
 
     return rc;
 }
-

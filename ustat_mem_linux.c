@@ -1,5 +1,3 @@
-#include "ustat_fs.h"
-
 #include <sys/sysinfo.h>
 
 static int _get_total_free(uint64_t* mem_total, uint64_t* mem_free) {
@@ -14,4 +12,3 @@ static int _get_total_free(uint64_t* mem_total, uint64_t* mem_free) {
 
     return 1;
 }
-

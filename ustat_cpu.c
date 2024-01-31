@@ -1,6 +1,7 @@
 #include "ustat.h"
+
 #include "djb/fmt.h"
-#include <stdlib.h>
+
 #include <unistd.h>
 
 int ncpus_print(int fd, struct ustat_module* m, const char* s, size_t l) {
