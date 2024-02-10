@@ -14,6 +14,7 @@ SET(ustat_src
     ustat_pass.c
     ustat_procs.c
     ustat_spec.c
+    ustat_uptime.c
     ustat_user.c
     ustat_helper/fmt_uint64.c
     ustat_helper/os_exit.c

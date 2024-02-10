@@ -12,6 +12,7 @@ SRC=ustat.c \
 	ustat_procs.c \
 	ustat_spec.c \
 	ustat_tcp.c \
+	ustat_uptime.c \
 	ustat_user.c \
 	ustat_helper/fmt_uint64.c \
 	ustat_helper/os_exit.c \

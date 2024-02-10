@@ -44,6 +44,10 @@ extern int bat_charging_print(int, struct ustat_module*, const char*, size_t);
 extern int bat_charging_human_print(int, struct ustat_module*, const char*,
                                     size_t);
 
+extern int uptime_init(struct ustat_module*, const char*, size_t);
+extern int uptime_print(int, struct ustat_module*, const char*, size_t);
+extern int uptime_print_human(int, struct ustat_module*, const char*, size_t);
+
 extern int tcp_init(struct ustat_module*, const char*, size_t);
 extern int ntcp_all_print(int, struct ustat_module*, const char*, size_t);
 extern int ntcp_closing_print(int, struct ustat_module*, const char*, size_t);
@@ -87,6 +91,9 @@ static struct ustat_module modules[] = {
     {"nl", "newline", 0, 0, 0, no_init, nl_print},
 
     {"load", "system load", 0, 0, 0, load_init, load_print},
+    {"ut+h", "uptime, human", 0, 0, 0, uptime_init, uptime_print_human},
+    {"ut", "uptime", 0, 0, 0, uptime_init, uptime_print},
+
     {"date", "date, strftime", 0, 0, 0, no_init, date_print},
     {"uid", "render user id", 0, 0, 0, no_init, uid_print},
     {"user", "render user name", 0, 0, 0, no_init, user_print},
