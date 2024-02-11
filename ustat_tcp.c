@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <stdlib.h>
 #include <sys/param.h>
 #include <unistd.h>
 
@@ -17,15 +16,14 @@ static void _sum_counters(uint64_t* to, uint64_t* from);
 
 #if defined(BSD)
 
-#include <errno.h>
+#include <sys/socket.h>
+#include <sys/socketvar.h>
+#include <sys/sysctl.h>
 #include <netinet/in.h>
 #include <netinet/in_pcb.h>
 #include <netinet/tcp.h>
 #include <netinet/tcp_fsm.h>
 #include <netinet/tcp_var.h>
-#include <sys/socket.h>
-#include <sys/socketvar.h>
-#include <sys/sysctl.h>
 
 enum {
     TCP_CLOSE = TCPS_CLOSED,

@@ -2,6 +2,12 @@
 // * http://src.gnu-darwin.org/src/usr.bin/sockstat/sockstat.c.html
 //
 
+#include "ustat.h"
+
+#include <sys/sysctl.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 static int _init_tcp_stats() {
 
     static const char name[] = "net.inet.tcp.pcblist";
@@ -47,10 +53,17 @@ static int _init_tcp_stats() {
             goto out;
         }
 
+        size_t i = 0;
+#if __FreeBSD_version >= 1200026
+        i = xtp->t_state;
+#else
+        i = xtp->xt_tp.t_state;
+#endif
+
         if (xtp->xt_inp.inp_vflag & INP_IPV4) {
-            _tcp4_counters[xtp->xt_tp.t_state]++;
+            _tcp4_counters[i]++;
         } else if (xtp->xt_inp.inp_vflag & INP_IPV6) {
-            _tcp6_counters[xtp->xt_tp.t_state]++;
+            _tcp6_counters[i]++;
         }
 
         rc = 1;
