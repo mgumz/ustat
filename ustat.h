@@ -23,6 +23,7 @@ extern int fmt_uint64(char* s, uint64_t val);
 extern int scan_hex(const char* s, size_t l, uint32_t* n);
 extern int first_n_fields(int out_fd, int fd, char sep, int n);
 extern void os_exit(int code, const char* msg);
+extern int os_getenv_or_def(const char** s, const char* env, const char* def);
 extern int read_double_from_fd(int fd, double* val);
 extern int write_double(int fd, double val, int prec);
 extern int write_uint64(int fd, uint64_t val);

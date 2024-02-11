@@ -62,6 +62,11 @@ ustat [-h] [mod1] [mod2] [...]
 * rgb#    - fg-color, rgb
 * rgb*    - bg-color, rgb
 
+### Environment Variables
+
+- USTAT_BAT_CHARGING - string to display "charging" (default: "^")
+- USTAT_BAT_DISCHARGING - string to display "discharging" (default: "v")
+
 ## Usage within tmux
 
 This config line for **tmux** will show the number of logged in users, the
@@ -115,6 +120,10 @@ To get a small static binary:
 ### MacOS
 
     make CFLAGS="-framework IOKit -framework CoreFoundation"
+
+### FreeBSD
+
+    make
 
 ### General
 

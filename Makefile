@@ -16,6 +16,7 @@ SRC=ustat.c \
 	ustat_user.c \
 	ustat_helper/fmt_uint64.c \
 	ustat_helper/os_exit.c \
+	ustat_helper/os_getenv_def.c \
 	ustat_helper/read_double_from_fd.c \
 	ustat_helper/scan_hex.c \
 	ustat_helper/write_uint64.c \

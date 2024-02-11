@@ -18,6 +18,7 @@ SET(ustat_src
     ustat_user.c
     ustat_helper/fmt_uint64.c
     ustat_helper/os_exit.c
+    ustat_helper/os_getenv_def.c
     ustat_helper/read_double_from_fd.c
     ustat_helper/scan_hex.c
     ustat_helper/write_uint64.c
@@ -48,4 +49,3 @@ ADD_EXECUTABLE(ustat ${ustat_src})
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     TARGET_LINK_LIBRARIES(ustat PUBLIC "-framework IOKit -framework CoreFoundation")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
