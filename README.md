@@ -79,8 +79,7 @@ set -g status-right "[#(ustat 'u:' nusers '|p:' nprocs '|/-' fsfh '|l:' load '|'
 
 ```
 
-A sample session might look like this:
-
+### Sample Session 1
 ![tmux with ustat](./media/screenshot-tmux-ustat.png "tmux with ustat")
 
 It shows on the right side, from left to right:
@@ -92,6 +91,20 @@ It shows on the right side, from left to right:
 * Disk free on /: 1644mbyte
 * Load is 0.01, 0.04 and 0.00 (see load(3))
 * The date is 2024-01-27, 15:10:30 CET
+
+### Sample Session 2
+![tmux with ustat](./media/screenshot-tmux-ustat2.png "tmux with ustat")
+
+Visible:
+
+* Uptime
+* Number of logged in users
+* Number of processes
+* Disk free on /
+* Load
+* Time
+
+Font: Victor Mono Nerd
 
 ## Compilation
 
